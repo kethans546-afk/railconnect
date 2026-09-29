@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -112,11 +112,11 @@
           seats.map(s => `${s.coachNumber || 'B1'}-${s.seatNumber}`).join(', ');
 
         seats.forEach((s, idx) => {
-          addPassengerRow(`Passenger ${idx + 1}`, s.seatId, s.seatNumber, s.berthType);
+          addPassengerRow(`Passenger ${idx + 1}`, s.seatId, s.seatNumber, s.berthType, s.coachNumber);
         });
       } else {
         document.getElementById('recapSeatsDisplay').textContent = 'Auto Allocated';
-        addPassengerRow('Primary Passenger', null, null, 'LOWER');
+        addPassengerRow('Primary Passenger', null, null, 'LOWER', coach === 'CC' ? 'C1' : 'B1');
       }
 
       const user = Api.getUser();
@@ -126,19 +126,23 @@
       }
     });
 
-    function addPassengerRow(defaultName = '', seatId = null, seatNumber = null, pref = 'NO_PREFERENCE') {
+    function addPassengerRow(defaultName = '', seatId = null, seatNumber = null, pref = 'NO_PREFERENCE', coachNumber = 'B1') {
       passengerCount++;
       const container = document.getElementById('passengerRowsContainer');
 
       const div = document.createElement('div');
       div.className = 'passenger-row-item';
       div.id = `passRow_${passengerCount}`;
+      div.dataset.seatId = seatId || '';
+      div.dataset.seatNumber = seatNumber || '';
+      div.dataset.coachNumber = coachNumber || '';
+      div.dataset.berthType = pref || '';
       div.style.cssText = 'padding:14px; background:var(--bg-main); border:1px solid var(--border); border-radius:var(--radius-md); margin-bottom:14px;';
 
       div.innerHTML = `
         <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
           <strong style="color:var(--primary); font-size:0.9rem;">
-            Passenger ${passengerCount} ${seatNumber ? `(Allocated Berth: #${seatNumber} ${pref})` : ''}
+            Passenger ${passengerCount} ${seatNumber ? `(Allocated: Coach ${coachNumber} • Berth #${seatNumber} ${pref})` : ''}
           </strong>
           ${passengerCount > 1 ? `<button type="button" class="btn btn-danger btn-sm" onclick="removeRow('passRow_${passengerCount}')">Remove</button>` : ''}
         </div>
@@ -191,17 +195,27 @@
     function handleProceedPayment(e) {
       e.preventDefault();
       const rows = document.querySelectorAll('.passenger-row-item');
+      const coach = sessionStorage.getItem('rc_coachType') || '3A';
+      const defCoach = coach === 'CC' ? 'C1' : coach === 'EC' ? 'E1' : 'B1';
       const passengers = [];
 
-      rows.forEach(r => {
+      rows.forEach((r, idx) => {
         passengers.push({
           name: r.querySelector('.p-name').value.trim(),
-          age: parseInt(r.querySelector('.p-age').value),
-          gender: r.querySelector('.p-gender').value,
-          berthPreference: r.querySelector('.p-pref').value,
-          selectedSeatId: r.querySelector('.p-seat-id').value ? parseInt(r.querySelector('.p-seat-id').value) : null
+          age: parseInt(r.querySelector('.p-age').value) || 29,
+          gender: r.querySelector('.p-gender').value || 'MALE',
+          berthPreference: r.querySelector('.p-pref').value || 'NO_PREFERENCE',
+          selectedSeatId: r.dataset.seatId ? parseInt(r.dataset.seatId) : null,
+          seatNumber: r.dataset.seatNumber ? parseInt(r.dataset.seatNumber) : (idx + 1),
+          coach: r.dataset.coachNumber || defCoach,
+          berthType: r.dataset.berthType || r.querySelector('.p-pref').value || (coach === 'CC' ? 'WINDOW' : 'LOWER')
         });
       });
+
+      const phone = document.getElementById('contactPhone').value.trim();
+      const email = document.getElementById('contactEmail').value.trim();
+      sessionStorage.setItem('rc_contactPhone', phone);
+      sessionStorage.setItem('rc_contactEmail', email);
 
       sessionStorage.setItem('rc_passengers', JSON.stringify(passengers));
       window.location.href = 'payment.html';

@@ -46,13 +46,13 @@ public class SeatEngineController {
     }
 
     @GetMapping("/coaches/{trainId}")
-    public ResponseEntity<List<Coach>> getCoaches(@PathVariable Long trainId) {
+    public ResponseEntity<List<Coach>> getCoaches(@PathVariable("trainId") Long trainId) {
         return ResponseEntity.ok(coachService.getCoachesByTrain(trainId));
     }
 
     @GetMapping("/layout/{coachId}")
     public ResponseEntity<CoachLayoutDto> getCoachLayout(
-            @PathVariable Long coachId,
+            @PathVariable("coachId") Long coachId,
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
         Long userId = extractUserId(authHeader);
         CoachLayoutDto layout = coachService.getCoachLayout(coachId, Collections.emptySet(), userId);

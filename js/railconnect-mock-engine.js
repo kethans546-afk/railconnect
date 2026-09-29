@@ -301,26 +301,40 @@
       const pnr = Math.floor(1000000000 + Math.random() * 9000000000).toString();
       const ticketId = `TKT-${pnr.substring(0, 4)}-${Math.floor(10 + Math.random() * 90)}`;
 
+      const rawPassengers = bookingData.passengers && bookingData.passengers.length > 0
+        ? bookingData.passengers
+        : [{ name: 'Passenger 1', age: 30, gender: 'Male' }];
+
+      const defCoach = bookingData.coachType === 'CC' ? 'C1' : bookingData.coachType === 'EC' ? 'E1' : 'B1';
+      const passengers = rawPassengers.map((p, idx) => ({
+        name: p.name || p.passengerName || `Passenger ${idx + 1}`,
+        age: p.age || p.passengerAge || 29,
+        gender: p.gender || p.passengerGender || 'Male',
+        coach: p.coach || p.allocatedCoach || defCoach,
+        seatNumber: p.seatNumber || p.allocatedSeatNumber || (idx + 12),
+        berthType: p.berthType || p.allocatedBerthType || (bookingData.coachType === 'CC' ? 'WINDOW' : 'LOWER'),
+        status: 'CONFIRMED'
+      }));
+
       const newBooking = {
+        id: db.bookings.length + 101,
+        pnr: pnr,
         pnrNumber: pnr,
         ticketId: ticketId,
         trainNumber: bookingData.trainNumber || '20608',
         trainName: bookingData.trainName || 'Vande Bharat Express',
+        fromStation: bookingData.fromStationCode || 'SBC',
         fromStationName: bookingData.fromStationName || 'SBC (Bengaluru)',
+        toStation: bookingData.toStationCode || 'MAS',
         toStationName: bookingData.toStationName || 'MAS (Chennai Central)',
         journeyDate: bookingData.journeyDate || new Date().toISOString().split('T')[0],
+        bookingDate: new Date().toISOString().split('T')[0],
         coachType: bookingData.coachType || 'CC',
+        coachCode: defCoach,
         totalFare: bookingData.totalFare || 667.33,
+        paymentMode: bookingData.paymentMethod ? `${bookingData.paymentMethod} (Verified)` : 'UPI (Verified)',
         status: 'CONFIRMED',
-        passengers: bookingData.passengers && bookingData.passengers.length > 0 ? bookingData.passengers : [{
-          name: 'Passenger 1',
-          age: 30,
-          gender: 'Male',
-          coach: 'C1',
-          seatNumber: 12,
-          berthType: 'WINDOW',
-          status: 'CONFIRMED'
-        }],
+        passengers: passengers,
         qrCodeText: `RAILCONNECT|PNR:${pnr}|TICKET:${ticketId}|TRAIN:${bookingData.trainNumber || '20608'}|STATUS:CONFIRMED`
       };
 
@@ -332,7 +346,7 @@
 
     getPnrStatus(pnr) {
       const db = loadDB();
-      const b = db.bookings.find(x => x.pnrNumber === pnr);
+      const b = db.bookings.find(x => x.pnrNumber === pnr || x.pnr === pnr);
       if (b) return b;
       return {
         pnrNumber: pnr,

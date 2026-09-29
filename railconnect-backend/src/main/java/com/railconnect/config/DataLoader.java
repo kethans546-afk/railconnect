@@ -180,13 +180,21 @@ public class DataLoader implements CommandLineRunner {
         Coach rB1 = coachRepository.save(new Coach(rajdhani.getId(), "B1", "3A", 64));
         Coach rH1 = coachRepository.save(new Coach(rajdhani.getId(), "H1", "1A", 24));
 
-        // Populate Seats for B1 & rB1 (3A layout: LOWER, MIDDLE, UPPER, SIDE_LOWER, SIDE_UPPER)
+        // Populate Seats for B1, B2 & rB1 (3A layout: LOWER, MIDDLE, UPPER, SIDE_LOWER, SIDE_UPPER)
         BerthType[] sleeperTypes = {BerthType.LOWER, BerthType.MIDDLE, BerthType.UPPER, BerthType.LOWER, BerthType.MIDDLE, BerthType.UPPER, BerthType.SIDE_LOWER, BerthType.SIDE_UPPER};
         for (int i = 1; i <= 64; i++) {
             BerthType type = sleeperTypes[(i - 1) % 8];
             int cabin = ((i - 1) / 8) + 1;
             seatRepository.save(new Seat(b1, i, type, cabin));
+            seatRepository.save(new Seat(b2, i, type, cabin));
             seatRepository.save(new Seat(rB1, i, type, cabin));
+        }
+
+        // Populate Seats for S1 (SL sleeper layout: 72 berths)
+        for (int i = 1; i <= 72; i++) {
+            BerthType type = sleeperTypes[(i - 1) % 8];
+            int cabin = ((i - 1) / 8) + 1;
+            seatRepository.save(new Seat(s1, i, type, cabin));
         }
 
         // Populate Seats for C1, C2 (CC layout: WINDOW, MIDDLE, AISLE)

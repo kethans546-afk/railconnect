@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -165,12 +165,21 @@
       const urlParams = new URLSearchParams(window.location.search);
       const pnrParam = urlParams.get('pnr');
 
-      const raw = sessionStorage.getItem('rc_lastBooking');
-      if (raw) {
-        const b = JSON.parse(raw);
-        populateTicket(b);
-      } else if (pnrParam) {
+      if (pnrParam) {
+        if (raw) {
+          try {
+            const b = JSON.parse(raw);
+            if (b.pnrNumber === pnrParam || b.pnr === pnrParam) {
+              populateTicket(b);
+              return;
+            }
+          } catch (e) {}
+        }
         loadBookingByPnr(pnrParam);
+      } else if (raw) {
+        try {
+          populateTicket(JSON.parse(raw));
+        } catch (e) {}
       } else {
         // Sample fallback ticket
         populateTicket({

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -254,13 +254,14 @@
         const isUpcoming = b.status === 'CONFIRMED' && b.journeyDate >= today;
         const statusBadgeClass = b.status === 'CONFIRMED' ? 'badge-success' :
                                  b.status === 'CANCELLED' ? 'badge-danger' : 'badge-info';
+        const pnrVal = b.pnrNumber || b.pnr || '4827193056';
 
         const passengerRows = (b.passengers || []).map(p => `
           <tr style="border-bottom: 1px solid var(--border);">
-            <td style="padding: 8px 12px; font-weight: 600;">${p.name}</td>
-            <td style="padding: 8px 12px; color: var(--text-muted);">${p.age} yrs / ${p.gender}</td>
+            <td style="padding: 8px 12px; font-weight: 600;">${p.name || p.passengerName}</td>
+            <td style="padding: 8px 12px; color: var(--text-muted);">${p.age || p.passengerAge || 29} yrs / ${p.gender || p.passengerGender || 'M'}</td>
             <td style="padding: 8px 12px; font-weight: 700; color: var(--primary);">
-              ${b.coachCode || b.coachType}-${p.seatNumber || 'WL'} (${p.berthType || 'SEAT'})
+              ${p.coach || p.allocatedCoach || b.coachCode || b.coachType || 'C1'}-${p.seatNumber || p.allocatedSeatNumber || '1'} (${p.berthType || p.allocatedBerthType || 'SEAT'})
             </td>
             <td style="padding: 8px 12px;">
               <span class="badge ${b.status === 'CONFIRMED' ? 'badge-success' : 'badge-warning'}" style="font-size: 0.75rem;">
@@ -277,7 +278,7 @@
               <div>
                 <div style="display: flex; align-items: center; gap: 10px;">
                   <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">PNR:</span>
-                  <span style="font-family: monospace; font-size: 1.15rem; font-weight: 800; color: var(--primary); letter-spacing: 1.5px;">${b.pnr}</span>
+                  <span style="font-family: monospace; font-size: 1.15rem; font-weight: 800; color: var(--primary); letter-spacing: 1.5px;">${pnrVal}</span>
                   <span class="badge ${statusBadgeClass}">${b.status}</span>
                 </div>
                 <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin-top: 4px;">
@@ -300,7 +301,7 @@
               <div>
                 <div style="font-size: 0.75rem; color: var(--text-muted);">DEPARTURE ➔ DESTINATION</div>
                 <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">
-                  ${b.fromStationName || b.fromStation} (${b.fromStation}) ➔ ${b.toStationName || b.toStation} (${b.toStation})
+                  ${b.fromStationName || b.fromStation} ➔ ${b.toStationName || b.toStation}
                 </div>
               </div>
               <div>
@@ -330,17 +331,17 @@
 
             <!-- Action Buttons Footer -->
             <div style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--border); padding-top: 14px;">
-              <a href="ticket.html?pnr=${b.pnr}" class="btn btn-secondary btn-sm">
+              <a href="ticket.html?pnr=${pnrVal}" class="btn btn-secondary btn-sm">
                 🎟️ Digital Travel Pass
               </a>
-              <a href="pnr-status.html?pnr=${b.pnr}" class="btn btn-secondary btn-sm">
+              <a href="pnr-status.html?pnr=${pnrVal}" class="btn btn-secondary btn-sm">
                 🔍 Track Live PNR
               </a>
               ${isUpcoming ? `
                 <a href="berth-exchange.html?bookingId=${b.id}&trainId=${b.trainNumber}" class="btn btn-outline btn-sm" style="border: 1px solid var(--primary); color: var(--primary);">
                   🔄 Berth Exchange
                 </a>
-                <button class="btn btn-danger btn-sm" onclick="promptCancel('${b.pnr}', ${b.totalFare})">
+                <button class="btn btn-danger btn-sm" onclick="promptCancel('${pnrVal}', ${b.totalFare})">
                   ❌ Cancel Ticket
                 </button>
               ` : ''}

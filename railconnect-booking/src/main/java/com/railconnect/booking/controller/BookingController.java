@@ -78,7 +78,7 @@ public class BookingController {
 
     @PostMapping("/cancel/{pnr}")
     public ResponseEntity<?> cancelBooking(
-            @PathVariable String pnr,
+            @PathVariable("pnr") String pnr,
             @RequestBody(required = false) Map<String, String> body) {
         String reason = (body != null) ? body.get("reason") : "Passenger Cancellation";
         try {

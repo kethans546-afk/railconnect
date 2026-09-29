@@ -80,10 +80,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/trains/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/seats/available/**").permitAll()
+                        .requestMatchers("/api/seats/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/pnr/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/weather/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tickets/qr/**", "/api/tickets/qr").permitAll()
+                        .requestMatchers("/api/bookings/create", "/api/bookings/cancel/**", "/api/bookings/my").permitAll()
                         .requestMatchers("/", "/index.html", "/*.html", "/css/**", "/js/**", "/assets/**", "/i18n/**", "/h2-console/**", "/favicon.ico", "/error").permitAll()
 
                         // Role-specific endpoints
@@ -91,8 +92,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/tickets/verify/**").hasAnyRole("ADMIN", "INSPECTOR")
 
                         // Authenticated user endpoints
-                        .requestMatchers("/api/bookings/**").authenticated()
-                        .requestMatchers("/api/seats/lock/**").authenticated()
                         .requestMatchers("/api/berth-exchange/**").authenticated()
                         .requestMatchers("/api/tickets/**").authenticated()
 

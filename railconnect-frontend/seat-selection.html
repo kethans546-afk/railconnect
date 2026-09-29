@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -130,14 +130,47 @@
   <script src="js/auth.js"></script>
   <script>
     let selectedSeats = [];
-    let currentCoachId = 6; // Default to B1 (Train 2 Pandian)
+    let currentCoachId = 1;
     let countdownInterval = null;
     let lockExpiryTimestamp = null;
 
     document.addEventListener('DOMContentLoaded', () => {
-      const trainName = sessionStorage.getItem('rc_trainName') || 'Pandian Superfast Express';
-      const coachType = sessionStorage.getItem('rc_coachType') || '3A';
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramCoachType = urlParams.get('coachType');
+      const paramTrainId = urlParams.get('trainId');
+
+      const trainName = sessionStorage.getItem('rc_trainName') || (paramTrainId === '1' ? 'Vande Bharat Express' : 'Pandian Superfast Express');
+      const coachType = paramCoachType || sessionStorage.getItem('rc_coachType') || 'CC';
+      const trainId = parseInt(paramTrainId || sessionStorage.getItem('rc_trainId') || '1');
+
       document.getElementById('trainDetailsHeader').textContent = `${trainName} • ${coachType}`;
+
+      // Populate coach options matching the train & coachType
+      const select = document.getElementById('coachSelect');
+      let optionsHtml = '';
+      if (coachType === 'CC') {
+        currentCoachId = 1;
+        optionsHtml = '<option value="1" selected>Coach C1 (CC)</option><option value="2">Coach C2 (CC)</option>';
+      } else if (coachType === 'EC') {
+        currentCoachId = 3;
+        optionsHtml = '<option value="3" selected>Coach E1 (EC)</option>';
+      } else if (coachType === '3A') {
+        currentCoachId = trainId === 3 ? 8 : 4;
+        optionsHtml = trainId === 3 
+          ? '<option value="8" selected>Coach B1 (3A)</option>' 
+          : '<option value="4" selected>Coach B1 (3A)</option><option value="5">Coach B2 (3A)</option>';
+      } else if (coachType === '2A') {
+        currentCoachId = 7;
+        optionsHtml = '<option value="7" selected>Coach A1 (2A)</option>';
+      } else if (coachType === '1A') {
+        currentCoachId = 9;
+        optionsHtml = '<option value="9" selected>Coach H1 (1A)</option>';
+      } else {
+        currentCoachId = 6;
+        optionsHtml = '<option value="6" selected>Coach S1 (SL)</option>';
+      }
+      select.innerHTML = optionsHtml;
+      select.value = currentCoachId;
 
       loadCoachLayout(currentCoachId);
     });
@@ -148,12 +181,14 @@
 
       try {
         const layout = await Api.getCoachLayout(coachId);
-        document.getElementById('coachDisplayTitle').textContent = `Coach ${layout.coachNumber} — ${layout.coachType} (${layout.totalSeats} Berths)`;
-        document.getElementById('coachAvailableCount').textContent = `Available: ${layout.availableCount}`;
-
-        renderSeatGrid(layout.seats);
+        if (layout && layout.seats && layout.seats.length > 0) {
+          document.getElementById('coachDisplayTitle').textContent = `Coach ${layout.coachNumber} — ${layout.coachType} (${layout.totalSeats} Berths)`;
+          document.getElementById('coachAvailableCount').textContent = `Available: ${layout.availableCount}`;
+          renderSeatGrid(layout.seats);
+          return;
+        }
+        renderFallbackSeats();
       } catch (e) {
-        // Fallback realistic layout rendering if backend is starting
         renderFallbackSeats();
       }
     }
@@ -168,7 +203,7 @@
           currentCabin = s.cabinNumber;
           const divider = document.createElement('div');
           divider.className = 'cabin-divider';
-          divider.textContent = `Compartment / Bay ${currentCabin}`;
+          divider.textContent = `Compartment / Row ${currentCabin}`;
           grid.appendChild(divider);
         }
 
@@ -195,19 +230,24 @@
     function renderFallbackSeats() {
       const grid = document.getElementById('seatGrid');
       grid.innerHTML = '';
-      const berths = ['LOWER', 'MIDDLE', 'UPPER', 'LOWER', 'MIDDLE', 'UPPER', 'SIDE_LOWER', 'SIDE_UPPER'];
+      const coachType = sessionStorage.getItem('rc_coachType') || 'CC';
+      const isChair = coachType === 'CC' || coachType === 'EC';
+      const berths = isChair ? ['WINDOW', 'AISLE', 'AISLE', 'WINDOW'] : ['LOWER', 'MIDDLE', 'UPPER', 'LOWER', 'MIDDLE', 'UPPER', 'SIDE_LOWER', 'SIDE_UPPER'];
+      const defCoach = coachType === 'CC' ? 'C1' : coachType === 'EC' ? 'E1' : 'B1';
+      document.getElementById('coachDisplayTitle').textContent = `Coach ${defCoach} — ${coachType} (${isChair ? 40 : 32} Seats)`;
+      document.getElementById('coachAvailableCount').textContent = `Available: 28`;
 
-      for (let i = 1; i <= 32; i++) {
-        const cabin = Math.floor((i - 1) / 8) + 1;
-        if ((i - 1) % 8 === 0) {
+      for (let i = 1; i <= (isChair ? 40 : 32); i++) {
+        const cabin = Math.floor((i - 1) / (isChair ? 4 : 8)) + 1;
+        if ((i - 1) % (isChair ? 4 : 8) === 0) {
           const divider = document.createElement('div');
           divider.className = 'cabin-divider';
-          divider.textContent = `Compartment / Bay ${cabin}`;
+          divider.textContent = `Compartment / Row ${cabin}`;
           grid.appendChild(divider);
         }
 
-        const bType = berths[(i - 1) % 8];
-        const sObj = { seatId: i, seatNumber: i, berthType: bType, coachNumber: 'B1', state: (i === 1 || i === 3) ? 'BOOKED' : 'AVAILABLE' };
+        const bType = berths[(i - 1) % berths.length];
+        const sObj = { seatId: i, seatNumber: i, berthType: bType, coachNumber: defCoach, state: (i === 1 || i === 3) ? 'BOOKED' : 'AVAILABLE' };
 
         const node = document.createElement('div');
         node.className = `seat-node ${sObj.state === 'BOOKED' ? 'state-booked' : 'state-available'}`;

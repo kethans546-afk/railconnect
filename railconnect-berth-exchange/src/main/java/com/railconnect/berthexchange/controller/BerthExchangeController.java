@@ -59,7 +59,7 @@ public class BerthExchangeController {
 
     @PostMapping("/respond/{id}")
     public ResponseEntity<?> respondToRequest(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody Map<String, Object> body,
             Authentication authentication,
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
@@ -85,10 +85,10 @@ public class BerthExchangeController {
 
     @GetMapping("/eligible")
     public ResponseEntity<List<BookingPassenger>> getEligiblePassengers(
-            @RequestParam Long trainId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate journeyDate,
-            @RequestParam String coachType,
-            @RequestParam(required = false) Long excludeBookingId) {
+            @RequestParam("trainId") Long trainId,
+            @RequestParam("journeyDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate journeyDate,
+            @RequestParam("coachType") String coachType,
+            @RequestParam(value = "excludeBookingId", required = false) Long excludeBookingId) {
         List<BookingPassenger> passengers = berthExchangeService.findEligiblePassengersForExchange(
                 trainId, journeyDate, coachType, excludeBookingId
         );
@@ -102,7 +102,7 @@ public class BerthExchangeController {
 
     @PostMapping("/admin/review/{id}")
     public ResponseEntity<?> adminReview(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody Map<String, Object> body,
             Authentication authentication,
             @RequestHeader(value = "Authorization", required = false) String authHeader) {

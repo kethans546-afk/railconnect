@@ -25,7 +25,7 @@ public class PNRController {
     }
 
     @GetMapping("/{pnr}")
-    public ResponseEntity<?> getPnrStatus(@PathVariable String pnr) {
+    public ResponseEntity<?> getPnrStatus(@PathVariable("pnr") String pnr) {
         Optional<Booking> bookingOpt = bookingService.getBookingByPnr(pnr);
         if (bookingOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

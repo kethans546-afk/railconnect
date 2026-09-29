@@ -27,7 +27,7 @@ public class WeatherController {
     }
 
     @GetMapping("/station/{code}")
-    public ResponseEntity<StationWeatherDto> getStationWeather(@PathVariable String code) {
+    public ResponseEntity<StationWeatherDto> getStationWeather(@PathVariable("code") String code) {
         StationWeatherDto response = weatherService.getStationWeather(code);
         return ResponseEntity.ok(response);
     }
