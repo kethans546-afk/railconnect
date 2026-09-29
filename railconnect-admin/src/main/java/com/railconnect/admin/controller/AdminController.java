@@ -120,6 +120,11 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/stations")
+    public ResponseEntity<List<Station>> getAllStations() {
+        return ResponseEntity.ok(adminService.getAllStations());
+    }
+
     @PostMapping("/stations")
     public ResponseEntity<?> addStation(
             @Valid @RequestBody StationManagementRequest request,
@@ -128,6 +133,19 @@ public class AdminController {
             Long adminId = getAdminId(authHeader);
             Station station = adminService.addStation(request, adminId);
             return ResponseEntity.status(HttpStatus.CREATED).body(station);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/stations/{id}")
+    public ResponseEntity<?> removeStation(
+            @PathVariable("id") Long id,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        try {
+            Long adminId = getAdminId(authHeader);
+            adminService.removeStation(id, adminId);
+            return ResponseEntity.ok(Map.of("message", "Station removed successfully from network."));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

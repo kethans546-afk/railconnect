@@ -99,6 +99,7 @@
     <!-- Navigation Tabs -->
     <div style="display: flex; border-bottom: 1px solid var(--border); margin-bottom: 24px; gap: 4px; overflow-x: auto;">
       <button class="admin-tab active" onclick="switchAdminTab('trains')">🚆 Train Fleet (Add / Remove)</button>
+      <button class="admin-tab" onclick="switchAdminTab('stations')">🚉 Station Network (Add / Manage)</button>
       <button class="admin-tab" onclick="switchAdminTab('routes')">🗺️ Manage Train Routes & Stops</button>
       <button class="admin-tab" onclick="switchAdminTab('fares')">💰 Dynamic Fare Engine</button>
       <button class="admin-tab" onclick="switchAdminTab('kpi')">📊 Executive KPIs</button>
@@ -195,7 +196,97 @@
       </div>
     </div>
 
-    <!-- TAB 2: MANAGE TRAIN ROUTES & HALT STATIONS -->
+    <!-- TAB 2: STATION NETWORK MANAGEMENT (ADD / MANAGE STATIONS) -->
+    <div id="tabContentStations" style="display: none;">
+      <!-- Add Station Card -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header">
+          <div>
+            <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--primary); margin: 0;">➕ Add Railway Station to National Network</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0 0;">Register new railway stations, terminals, and junctions with platform capacity and regional zone</p>
+          </div>
+          <span class="badge badge-info">ADMIN PRIVILEGE</span>
+        </div>
+        <form id="addStationForm" onsubmit="handleCreateStation(event)" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 14px;">
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label">Station Code (IR Code)</label>
+            <input type="text" id="newStationCode" class="form-control" placeholder="e.g. SBC, NDLS, HYB" maxlength="8" style="text-transform: uppercase;" required>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label">Station Name</label>
+            <input type="text" id="newStationName" class="form-control" placeholder="e.g. KSR Bengaluru City Junction" required>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label">City</label>
+            <input type="text" id="newStationCity" class="form-control" placeholder="e.g. Bengaluru" required>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label">State</label>
+            <input type="text" id="newStationState" class="form-control" placeholder="e.g. Karnataka" required>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label">Railway Zone</label>
+            <select id="newStationZone" class="form-control">
+              <option value="SWR">SWR — South Western Railway</option>
+              <option value="SR">SR — Southern Railway</option>
+              <option value="NR">NR — Northern Railway</option>
+              <option value="WR">WR — Western Railway</option>
+              <option value="CR">CR — Central Railway</option>
+              <option value="SCR">SCR — South Central Railway</option>
+              <option value="ER">ER — Eastern Railway</option>
+              <option value="ECR">ECR — East Central Railway</option>
+              <option value="NCR">NCR — North Central Railway</option>
+              <option value="NWR">NWR — North Western Railway</option>
+              <option value="SECR">SECR — South East Central</option>
+              <option value="WCR">WCR — West Central Railway</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label">Platforms Count</label>
+            <input type="number" id="newStationPlatforms" class="form-control" value="10" min="1" max="40" required>
+          </div>
+          <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end; margin-top: 6px;">
+            <button type="submit" class="btn btn-primary" style="padding: 10px 24px; font-weight: 700;">
+              ➕ Save Station to Network
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Active Stations Table Card -->
+      <div class="card">
+        <div class="card-header" style="flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--primary); margin: 0;">🚉 Registered Railway Stations</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0 0;">All operational stations available for train routing and passenger search</p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="text" id="stationFilterInput" placeholder="🔍 Search station / code / city..." class="form-control" style="font-size: 0.85rem; width: 220px;" oninput="filterStations(this.value)">
+            <span class="badge badge-primary" id="stationsCountBadge">0 Stations</span>
+          </div>
+        </div>
+        <div style="overflow-x: auto; margin-top: 14px;">
+          <table style="width: 100%; text-align: left; font-size: 0.85rem; border-collapse: collapse;">
+            <thead>
+              <tr style="background: var(--bg-main); border-bottom: 2px solid var(--border); color: var(--text-muted);">
+                <th style="padding: 12px 10px;">Code</th>
+                <th style="padding: 12px 10px;">Station Name</th>
+                <th style="padding: 12px 10px;">City</th>
+                <th style="padding: 12px 10px;">State</th>
+                <th style="padding: 12px 10px;">Zone</th>
+                <th style="padding: 12px 10px; text-align: center;">Platforms</th>
+                <th style="padding: 12px 10px; text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="stationsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: MANAGE TRAIN ROUTES & HALT STATIONS -->
     <div id="tabContentRoutes" style="display: none;">
       <div class="card" style="margin-bottom: 20px;">
         <div class="card-header">
@@ -420,7 +511,10 @@
 
   </div>
 
-  <script src="js/railconnect-mock-engine.js"></script>`r`n  <script src="js/seat-layout-engine.js"></script>`r`n  <script src="js/journey-assistant.js"></script>`r`n  <script src="js/api.js"></script>
+  <script src="js/railconnect-mock-engine.js"></script>
+  <script src="js/seat-layout-engine.js"></script>
+  <script src="js/journey-assistant.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/auth.js"></script>
   <script>
@@ -434,7 +528,7 @@
       const user = Api.getUser();
       if (!user || user.role !== 'ROLE_ADMIN') {
         try {
-          await Api.login('admin', 'password123');
+          await Api.login('ks9312', 'Kethan2007');
         } catch (e) {
           console.warn("Using offline simulated admin session");
         }
@@ -451,7 +545,7 @@
     }
 
     function switchAdminTab(tab) {
-      const tabs = ['trains', 'routes', 'fares', 'kpi', 'tte', 'audits'];
+      const tabs = ['trains', 'stations', 'routes', 'fares', 'kpi', 'tte', 'audits'];
       tabs.forEach(t => {
         const content = document.getElementById(`tabContent${t.charAt(0).toUpperCase() + t.slice(1)}`);
         if (content) content.style.display = (t === tab) ? 'block' : 'none';
@@ -464,21 +558,108 @@
 
     async function loadStations() {
       try {
-        currentStations = await Api.getStations();
-        const fromSelect = document.getElementById('newTrainFrom');
-        const toSelect = document.getElementById('newTrainTo');
-        const routeStationSelect = document.getElementById('newRouteStation');
-
-        const options = currentStations.map(s => `<option value="${s.id}">${s.name} (${s.code})</option>`).join('');
-        fromSelect.innerHTML = options;
-        toSelect.innerHTML = options;
-        routeStationSelect.innerHTML = options;
-
-        if (currentStations.length >= 2) {
-          toSelect.selectedIndex = 1;
+        currentStations = await Api.getAllStations();
+        if (!currentStations || currentStations.length === 0) {
+          currentStations = await Api.getStations();
         }
       } catch (e) {
         console.warn("Could not fetch stations:", e);
+        if (!currentStations || currentStations.length === 0) {
+          currentStations = [
+            { id: 1, code: "SBC", name: "KSR Bengaluru City", city: "Bengaluru", state: "Karnataka", zone: "SWR", platformCount: 10 },
+            { id: 2, code: "MAS", name: "Puratchi Thalaivar Dr. M.G.R Chennai Central", city: "Chennai", state: "Tamil Nadu", zone: "SR", platformCount: 12 },
+            { id: 3, code: "NDLS", name: "New Delhi Railway Station", city: "New Delhi", state: "Delhi", zone: "NR", platformCount: 16 },
+            { id: 4, code: "BCT", name: "Mumbai Central", city: "Mumbai", state: "Maharashtra", zone: "WR", platformCount: 9 },
+            { id: 5, code: "HWH", name: "Howrah Junction", city: "Kolkata", state: "West Bengal", zone: "ER", platformCount: 23 },
+            { id: 6, code: "HYB", name: "Hyderabad Deccan", city: "Hyderabad", state: "Telangana", zone: "SCR", platformCount: 6 }
+          ];
+        }
+      }
+
+      renderStationsTable(currentStations);
+
+      const fromSelect = document.getElementById('newTrainFrom');
+      const toSelect = document.getElementById('newTrainTo');
+      const routeStationSelect = document.getElementById('newRouteStation');
+
+      const options = currentStations.map(s => `<option value="${s.id}">${s.name} (${s.code})</option>`).join('');
+      if (fromSelect) fromSelect.innerHTML = options;
+      if (toSelect) toSelect.innerHTML = options;
+      if (routeStationSelect) routeStationSelect.innerHTML = options;
+
+      if (toSelect && currentStations.length >= 2) {
+        toSelect.selectedIndex = 1;
+      }
+    }
+
+    function renderStationsTable(stations) {
+      const tbody = document.getElementById('stationsTableBody');
+      const badge = document.getElementById('stationsCountBadge');
+      if (badge) badge.textContent = `${stations.length} Stations`;
+      if (!tbody) return;
+
+      tbody.innerHTML = stations.map(s => `
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px; font-weight: 800; font-family: monospace; color: var(--primary); font-size: 0.95rem;">${s.code}</td>
+          <td style="padding: 10px; font-weight: 600;">${s.name}</td>
+          <td style="padding: 10px;">${s.city || '--'}</td>
+          <td style="padding: 10px; color: var(--text-muted);">${s.state || '--'}</td>
+          <td style="padding: 10px;"><span class="badge badge-info">${s.zone || 'IR'}</span></td>
+          <td style="padding: 10px; text-align: center;">${s.platformCount || 4}</td>
+          <td style="padding: 10px; text-align: right;">
+            <button class="btn btn-sm btn-outline-danger" onclick="handleRemoveStation(${s.id}, '${s.code}')" style="color: #c53030; border: 1px solid #feb2b2; padding: 4px 10px; background: white; border-radius: 4px; cursor: pointer;">
+              🗑️ Delete
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterStations(query) {
+      const q = (query || '').toLowerCase().trim();
+      if (!q) {
+        renderStationsTable(currentStations);
+        return;
+      }
+      const filtered = currentStations.filter(s => 
+        (s.code && s.code.toLowerCase().includes(q)) ||
+        (s.name && s.name.toLowerCase().includes(q)) ||
+        (s.city && s.city.toLowerCase().includes(q)) ||
+        (s.state && s.state.toLowerCase().includes(q)) ||
+        (s.zone && s.zone.toLowerCase().includes(q))
+      );
+      renderStationsTable(filtered);
+    }
+
+    async function handleCreateStation(e) {
+      e.preventDefault();
+      const code = document.getElementById('newStationCode').value.trim().toUpperCase();
+      const name = document.getElementById('newStationName').value.trim();
+      const city = document.getElementById('newStationCity').value.trim();
+      const state = document.getElementById('newStationState').value.trim();
+      const zone = document.getElementById('newStationZone').value;
+      const platformCount = parseInt(document.getElementById('newStationPlatforms').value) || 4;
+
+      const stationData = { code, name, city, state, zone, platformCount };
+
+      try {
+        await Api.addStation(stationData);
+        Auth.showToast(`Station ${code} - ${name} added successfully!`, 'success');
+        document.getElementById('addStationForm').reset();
+        await loadStations();
+      } catch (err) {
+        Auth.showToast(err.message || 'Error adding station', 'danger');
+      }
+    }
+
+    async function handleRemoveStation(id, code) {
+      if (!confirm(`Are you sure you want to remove station ${code}?`)) return;
+      try {
+        await Api.removeStation(id);
+        Auth.showToast(`Station ${code} removed from network.`, 'info');
+        await loadStations();
+      } catch (err) {
+        Auth.showToast(err.message || 'Error removing station', 'danger');
       }
     }
 
@@ -872,8 +1053,8 @@
 
     function quickLoginRole(role) {
       if (role === 'ADMIN') {
-        Api.setUser({ id: 1, username: 'admin', fullName: 'Chief Operations Officer', role: 'ROLE_ADMIN', email: 'admin@railconnect.gov' });
-        Auth.showToast('Logged in as Administrator (Full CRUD Access)', 'success');
+        Api.setUser({ id: 1, username: 'ks9312', fullName: 'Kethan (Chief Operations Admin)', role: 'ROLE_ADMIN', email: 'ks9312@railconnect.gov' });
+        Auth.showToast('Logged in as Administrator ks9312 (Full CRUD Access)', 'success');
       } else {
         Api.setUser({ id: 3, username: 'inspector_anand', fullName: 'TTE Anand Kumar', role: 'ROLE_INSPECTOR', email: 'anand.tte@railconnect.gov' });
         Auth.showToast('Logged in as Traveling Ticket Examiner (TTE)', 'info');

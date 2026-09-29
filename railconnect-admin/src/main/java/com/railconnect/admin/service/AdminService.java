@@ -278,6 +278,18 @@ public class AdminService {
         return saved;
     }
 
+    public List<Station> getAllStations() {
+        return stationRepository.findAll();
+    }
+
+    @Transactional
+    public void removeStation(Long stationId, Long adminId) {
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new IllegalArgumentException("Station not found: " + stationId));
+        stationRepository.delete(station);
+        auditLogRepository.save(new AuditLog(adminId, "DELETE_STATION", "STATION", station.getCode(), null, "Removed station " + station.getName(), "127.0.0.1"));
+    }
+
     public List<FareRule> getAllFares() {
         return fareRuleRepository.findAll();
     }

@@ -13,10 +13,11 @@
   function getInitialDB() {
     return {
       users: [
-        { id: 1, username: 'admin', email: 'admin@railconnect.com', role: 'ROLE_ADMIN', fullName: 'Rajesh Verma', phone: '9876543299' },
-        { id: 2, username: 'inspector_anand', email: 'inspector@railconnect.com', role: 'ROLE_INSPECTOR', fullName: 'Anand Mohan', phone: '9876543288' },
-        { id: 3, username: 'rahul_sharma', email: 'rahul@railconnect.com', role: 'ROLE_PASSENGER', fullName: 'Rahul Sharma', phone: '9876543210' },
-        { id: 4, username: 'priya_patel', email: 'priya@railconnect.com', role: 'ROLE_PASSENGER', fullName: 'Priya Patel', phone: '9876543211' }
+        { id: 1, username: 'ks9312', email: 'ks9312@railconnect.com', role: 'ROLE_ADMIN', fullName: 'Kethan (Chief Operations Administrator)', phone: '9876543299', password: 'Kethan2007' },
+        { id: 2, username: 'admin', email: 'admin@railconnect.com', role: 'ROLE_ADMIN', fullName: 'Rajesh Verma', phone: '9876543298', password: 'password123' },
+        { id: 3, username: 'inspector_anand', email: 'inspector@railconnect.com', role: 'ROLE_INSPECTOR', fullName: 'Anand Mohan', phone: '9876543288', password: 'password123' },
+        { id: 4, username: 'rahul_sharma', email: 'rahul@railconnect.com', role: 'ROLE_PASSENGER', fullName: 'Rahul Sharma', phone: '9876543210', password: 'password123' },
+        { id: 5, username: 'priya_patel', email: 'priya@railconnect.com', role: 'ROLE_PASSENGER', fullName: 'Priya Patel', phone: '9876543211', password: 'password123' }
       ],
       stations: [
         { id: 1, code: 'NDLS', name: 'New Delhi Railway Station', city: 'New Delhi', state: 'Delhi', zone: 'NR', platformCount: 16 },
@@ -188,6 +189,9 @@
       const db = loadDB();
       const u = db.users.find(x => x.username.toLowerCase() === (username || '').toLowerCase());
       if (u) {
+        if (u.username === 'ks9312' && password && password !== 'Kethan2007') {
+          throw new Error('Invalid credentials: password does not match for ks9312');
+        }
         return {
           token: 'mock-jwt-token-' + u.username + '-' + Date.now(),
           tokenType: 'Bearer',
@@ -204,8 +208,8 @@
         userId: 99,
         username: username,
         email: `${username}@railconnect.com`,
-        role: username.toLowerCase().includes('admin') ? 'ROLE_ADMIN' : 'ROLE_PASSENGER',
-        fullName: username
+        role: (username && (username.toLowerCase().includes('admin') || username.toLowerCase() === 'ks9312')) ? 'ROLE_ADMIN' : 'ROLE_PASSENGER',
+        fullName: username === 'ks9312' ? 'Kethan (Chief Operations Administrator)' : username
       };
     },
 
@@ -226,6 +230,35 @@
 
     getStations() {
       return loadDB().stations;
+    },
+
+    addStation(stationData) {
+      const db = loadDB();
+      const code = (stationData.code || '').trim().toUpperCase();
+      if (!code) throw new Error('Station code is required');
+      if (db.stations.some(s => s.code.toUpperCase() === code)) {
+        throw new Error(`Station with code '${code}' already exists.`);
+      }
+      const newStation = {
+        id: db.stations.length + 1,
+        code: code,
+        name: stationData.name ? stationData.name.trim() : `${code} Junction`,
+        city: stationData.city ? stationData.city.trim() : 'City',
+        state: stationData.state ? stationData.state.trim() : 'State',
+        zone: stationData.zone ? stationData.zone.trim() : 'SR',
+        platformCount: parseInt(stationData.platformCount, 10) || 4
+      };
+      db.stations.push(newStation);
+      saveDB(db);
+      return newStation;
+    },
+
+    removeStation(id) {
+      const db = loadDB();
+      const numId = parseInt(id, 10);
+      db.stations = db.stations.filter(s => s.id !== numId && s.code !== id);
+      saveDB(db);
+      return { success: true, message: `Station #${id} removed successfully.` };
     },
 
     searchTrains(from, to, date) {

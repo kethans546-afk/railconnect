@@ -114,6 +114,14 @@ const Api = {
       return { qrImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADIAQAAAACFI5MzAAAA4klEQVR4Xu2USw7EIAxD3RXH4KYt3JRjsCpjp51qvut6gYVQmtcFipNg/BM+E5cmmUSaxIZ0UMtoQC4KsxNRWDvhqM9PH1KQa8/14IZktDW5Enmu242MqCXSt9u3k5gSuq3nv0/J7eRQj8QlE9LBHiwsZ9jOwIjI6jy6ciVpVqzIkaPRa2q03Ym0TUVtG38RjJwNWWJE9rBa1TUioR6LGdoxRuTcLjprPNyJZF41+pHxbkYKopypAYrtiDqRVqsr7QgrCrldzQgvvToWzCkXwkpqRLY4eO3E28lPTTKJNIk3eQCoOFRqAPJjvgAAAABJRU5ErkJggg==' };
     }
     if (endpoint === '/admin/dashboard') return mock.getDashboardStats();
+    if (endpoint === '/admin/stations') {
+      if (method === 'POST') return mock.addStation(body);
+      return mock.getStations();
+    }
+    if (endpoint.startsWith('/admin/stations/')) {
+      const stationId = endpoint.split('/').pop();
+      if (method === 'DELETE') return mock.removeStation(stationId);
+    }
     if (endpoint === '/admin/trains') {
       if (method === 'POST') return mock.addTrain(body);
       return mock.getAllTrains();
@@ -350,6 +358,23 @@ const Api = {
     return await this.request('/admin/fares', {
       method: 'POST',
       body: JSON.stringify(fareData),
+    });
+  },
+
+  async getAllStations() {
+    return await this.request('/admin/stations');
+  },
+
+  async addStation(stationData) {
+    return await this.request('/admin/stations', {
+      method: 'POST',
+      body: JSON.stringify(stationData),
+    });
+  },
+
+  async removeStation(stationId) {
+    return await this.request(`/admin/stations/${stationId}`, {
+      method: 'DELETE',
     });
   },
 

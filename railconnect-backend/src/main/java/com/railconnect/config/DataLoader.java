@@ -73,7 +73,9 @@ public class DataLoader implements CommandLineRunner {
 
         // 1. Users
         String encodedPass = passwordEncoder.encode("password123");
-        User admin = userRepository.save(new User("admin", "admin@railconnect.com", "9876543299", encodedPass, "ROLE_ADMIN", "Rajesh", "Verma"));
+        String kethanPass = passwordEncoder.encode("Kethan2007");
+        User admin = userRepository.save(new User("ks9312", "ks9312@railconnect.com", "9876543299", kethanPass, "ROLE_ADMIN", "Kethan", "Admin"));
+        userRepository.save(new User("admin", "admin@railconnect.com", "9876543298", encodedPass, "ROLE_ADMIN", "Rajesh", "Verma"));
         User inspector = userRepository.save(new User("inspector_anand", "inspector@railconnect.com", "9876543288", encodedPass, "ROLE_INSPECTOR", "Anand", "Mohan"));
         User rahul = userRepository.save(new User("rahul_sharma", "rahul@railconnect.com", "9876543210", encodedPass, "ROLE_PASSENGER", "Rahul", "Sharma"));
         User priya = userRepository.save(new User("priya_patel", "priya@railconnect.com", "9876543211", encodedPass, "ROLE_PASSENGER", "Priya", "Patel"));
