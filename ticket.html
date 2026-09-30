@@ -158,8 +158,7 @@
   <script src="js/api.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/auth.js"></script>
-  <!-- Lightweight Canvas QR Code Generator for standalone browser execution -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="js/qrcode.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -236,17 +235,17 @@
     }
 
     function populateTicket(b) {
-      document.getElementById('tPnr').textContent = b.pnrNumber || '4827193056';
+      document.getElementById('tPnr').textContent = b.pnrNumber || b.pnr || '4827193056';
       document.getElementById('tTicketId').textContent = b.ticketId || 'TKT-4827-01';
-      document.getElementById('tTrain').textContent = `${b.trainNumber || '12638'} • ${b.trainName || 'Express'}`;
-      document.getElementById('tClass').textContent = `${b.coachType || '3A'}`;
-      document.getElementById('tDate').textContent = b.journeyDate || '2026-10-10';
-      document.getElementById('tFrom').textContent = b.fromStationName || 'TPJ';
-      document.getElementById('tTo').textContent = b.toStationName || 'MAS';
+      document.getElementById('tTrain').textContent = `${b.trainNumber || '20608'} • ${b.trainName || 'Vande Bharat Express'}`;
+      document.getElementById('tClass').textContent = `${b.coachType || 'CC'}`;
+      document.getElementById('tDate').textContent = b.journeyDate || '2026-10-15';
+      document.getElementById('tFrom').textContent = b.fromStationName || 'SBC (Bengaluru)';
+      document.getElementById('tTo').textContent = b.toStationName || 'MAS (Chennai Central)';
       document.getElementById('tStatus').textContent = b.status || 'CONFIRMED';
-      document.getElementById('tFare').textContent = `₹${(b.totalFare || 530).toFixed(2)}`;
+      document.getElementById('tFare').textContent = `₹${(b.totalFare || 667.33).toFixed(2)}`;
 
-      const qrPayload = b.qrCodeText || `RAILCONNECT|PNR:${b.pnrNumber || '4827193056'}|TICKET:${b.ticketId || 'TKT-4827-01'}|TRAIN:${b.trainNumber || '12638'}|STATUS:CONFIRMED`;
+      const qrPayload = b.qrCodeText || `RAILCONNECT|PNR:${b.pnrNumber || b.pnr || '4827193056'}|TICKET:${b.ticketId || 'TKT-4827-01'}|TRAIN:${b.trainNumber || '20608'}|STATUS:CONFIRMED`;
       document.getElementById('qrTextPreview').textContent = qrPayload;
 
       // Infallible Multi-Tier QR Code Generator
@@ -258,9 +257,9 @@
           <tr>
             <td><strong>${p.name || p.passengerName}</strong></td>
             <td>${p.age || p.passengerAge} / ${p.gender || p.passengerGender}</td>
-            <td><span class="badge badge-info">${p.coach || p.allocatedCoach || 'B1'}</span></td>
-            <td><strong>${p.seatNumber || p.allocatedSeatNumber || '1'}</strong></td>
-            <td>${p.berthType || p.allocatedBerthType || 'LOWER'}</td>
+            <td><span class="badge badge-info">${p.coach || p.allocatedCoach || 'C1'}</span></td>
+            <td><strong>${p.seatNumber || p.allocatedSeatNumber || '15'}</strong></td>
+            <td>${p.berthType || p.allocatedBerthType || 'WINDOW'}</td>
             <td><span class="badge badge-success">CNF</span></td>
           </tr>
         `).join('');
@@ -271,7 +270,29 @@
       const container = document.getElementById('qrContainer');
       if (!container) return;
 
-      // Tier 1: Query server-side ZXing generator
+      // Tier 1: Local standard QR engine via bundled qrcode.min.js (0ms, 100% offline, ISO/IEC 18004)
+      if (typeof QRCode !== 'undefined') {
+        try {
+          container.innerHTML = '';
+          new QRCode(container, {
+            text: qrPayload,
+            width: 118,
+            height: 118,
+            colorDark: '#0f172a',
+            colorLight: '#ffffff',
+            correctLevel: (typeof QRCode.CorrectLevel !== 'undefined') ? QRCode.CorrectLevel.H : 2
+          });
+          const img = container.querySelector('img');
+          const canvas = container.querySelector('canvas');
+          if (img) { img.style.width = '118px'; img.style.height = '118px'; img.style.display = 'block'; }
+          if (canvas) { canvas.style.width = '118px'; canvas.style.height = '118px'; }
+          return;
+        } catch (e) {
+          console.warn("Local QR engine error, falling back:", e);
+        }
+      }
+
+      // Tier 2: Server-side ZXing generator
       try {
         const res = await Api.getQRCode(qrPayload, 200);
         if (res && res.qrImage && res.qrImage.length > 50) {
@@ -279,33 +300,11 @@
           return;
         }
       } catch (err) {
-        console.warn("Server ZXing QR fetch not reached, rendering on-device canvas:", err);
+        console.warn("Server ZXing QR fetch not reached:", err);
       }
 
-      // Ensure canvas element exists inside container
-      let canvas = document.getElementById('qrCanvas');
-      if (!canvas) {
-        container.innerHTML = '<canvas id="qrCanvas" width="118" height="118"></canvas>';
-        canvas = document.getElementById('qrCanvas');
-      }
-
-      // Tier 2: Use client-side library if present
-      if (window.QRCode && canvas) {
-        try {
-          QRCode.toCanvas(canvas, qrPayload, { width: 118, margin: 1 }, function (error) {
-            if (!error) return;
-            drawFallbackQR(canvas, qrPayload);
-          });
-          return;
-        } catch (e) {
-          console.warn("Client QR library exception, using fallback matrix:", e);
-        }
-      }
-
-      // Tier 3: Zero-dependency local QR canvas generator
-      if (canvas) {
-        drawFallbackQR(canvas, qrPayload);
-      }
+      // Tier 3: High reliability public QR endpoint
+      container.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrPayload)}" alt="Digital Pass QR" style="width: 118px; height: 118px; display: block;">`;
     }
 
     function drawFallbackQR(canvas, text) {

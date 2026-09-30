@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -69,7 +70,7 @@ public class DataLoader implements CommandLineRunner {
             return; // Data already initialized
         }
 
-        System.out.println(">>> RailConnect: Bootstrapping master railway reference data & realistic scenarios...");
+        System.out.println(">>> RailConnect: Bootstrapping comprehensive master railway network & realistic scenarios...");
 
         // 1. Users
         String encodedPass = passwordEncoder.encode("password123");
@@ -81,18 +82,31 @@ public class DataLoader implements CommandLineRunner {
         User priya = userRepository.save(new User("priya_patel", "priya@railconnect.com", "9876543211", encodedPass, "ROLE_PASSENGER", "Priya", "Patel"));
         User suresh = userRepository.save(new User("suresh_kumar", "suresh@railconnect.com", "9876543212", encodedPass, "ROLE_PASSENGER", "Suresh", "Kumar"));
 
-        // 2. Stations
+        // 2. Stations (24 Major Railway Stations across India)
         Station ndls = stationRepository.save(new Station("NDLS", "New Delhi Railway Station", "New Delhi", "Delhi", "NR", 16));
         Station bct = stationRepository.save(new Station("BCT", "Mumbai Central", "Mumbai", "Maharashtra", "WR", 8));
+        Station csmt = stationRepository.save(new Station("CSMT", "Chhatrapati Shivaji Maharaj Terminus", "Mumbai", "Maharashtra", "CR", 18));
         Station mas = stationRepository.save(new Station("MAS", "Chennai Central", "Chennai", "Tamil Nadu", "SR", 12));
         Station ms = stationRepository.save(new Station("MS", "Chennai Egmore", "Chennai", "Tamil Nadu", "SR", 11));
-        Station tpj = stationRepository.save(new Station("TPJ", "Tiruchchirappalli Junction (Trichy)", "Tiruchirappalli", "Tamil Nadu", "SR", 8));
         Station sbc = stationRepository.save(new Station("SBC", "KSR Bengaluru City Junction", "Bengaluru", "Karnataka", "SWR", 10));
-        Station kpd = stationRepository.save(new Station("KPD", "Katpadi Junction", "Vellore", "Tamil Nadu", "SR", 5));
+        Station mys = stationRepository.save(new Station("MYS", "Mysuru Junction", "Mysuru", "Karnataka", "SWR", 6));
         Station hwh = stationRepository.save(new Station("HWH", "Howrah Junction", "Kolkata", "West Bengal", "ER", 23));
         Station hyb = stationRepository.save(new Station("HYB", "Hyderabad Deccan", "Hyderabad", "Telangana", "SCR", 6));
+        Station sc = stationRepository.save(new Station("SC", "Secunderabad Junction", "Hyderabad", "Telangana", "SCR", 10));
         Station adi = stationRepository.save(new Station("ADI", "Ahmedabad Junction", "Ahmedabad", "Gujarat", "WR", 12));
         Station cnb = stationRepository.save(new Station("CNB", "Kanpur Central", "Kanpur", "Uttar Pradesh", "NCR", 10));
+        Station bsb = stationRepository.save(new Station("BSB", "Varanasi Junction", "Varanasi", "Uttar Pradesh", "NR", 9));
+        Station lko = stationRepository.save(new Station("LKO", "Lucknow Charbagh", "Lucknow", "Uttar Pradesh", "NR", 9));
+        Station pnbe = stationRepository.save(new Station("PNBE", "Patna Junction", "Patna", "Bihar", "ECR", 10));
+        Station tpj = stationRepository.save(new Station("TPJ", "Tiruchchirappalli Junction (Trichy)", "Tiruchirappalli", "Tamil Nadu", "SR", 8));
+        Station kpd = stationRepository.save(new Station("KPD", "Katpadi Junction", "Vellore", "Tamil Nadu", "SR", 5));
+        Station cbe = stationRepository.save(new Station("CBE", "Coimbatore Junction", "Coimbatore", "Tamil Nadu", "SR", 6));
+        Station pune = stationRepository.save(new Station("PUNE", "Pune Junction", "Pune", "Maharashtra", "CR", 6));
+        Station jp = stationRepository.save(new Station("JP", "Jaipur Junction", "Jaipur", "Rajasthan", "NWR", 8));
+        Station bpl = stationRepository.save(new Station("BPL", "Bhopal Junction", "Bhopal", "Madhya Pradesh", "WCR", 6));
+        Station tvc = stationRepository.save(new Station("TVC", "Thiruvananthapuram Central", "Thiruvananthapuram", "Kerala", "SR", 5));
+        Station gkp = stationRepository.save(new Station("GKP", "Gorakhpur Junction", "Gorakhpur", "Uttar Pradesh", "NER", 10));
+        Station asr = stationRepository.save(new Station("ASR", "Amritsar Junction", "Amritsar", "Punjab", "NR", 7));
 
         // 3. Fare Rules
         fareRuleRepository.save(new FareRule("EXPRESS", "SL", 0.45, 20.0, 30.0, 0.0));
@@ -105,126 +119,259 @@ public class DataLoader implements CommandLineRunner {
         fareRuleRepository.save(new FareRule("RAJDHANI", "3A", 1.45, 40.0, 75.0, 5.0));
         fareRuleRepository.save(new FareRule("RAJDHANI", "2A", 2.10, 50.0, 75.0, 5.0));
         fareRuleRepository.save(new FareRule("RAJDHANI", "1A", 3.10, 60.0, 75.0, 5.0));
+        fareRuleRepository.save(new FareRule("SHATABDI", "CC", 1.20, 40.0, 45.0, 5.0));
+        fareRuleRepository.save(new FareRule("SHATABDI", "EC", 2.30, 60.0, 75.0, 5.0));
 
-        // 4. Trains
-        // Train 1: Vande Bharat (SBC -> MAS)
-        Train vb = new Train();
-        vb.setTrainNumber("20608");
-        vb.setTrainName("Vande Bharat Express");
-        vb.setTrainType("VANDE_BHARAT");
-        vb.setSourceStation(sbc);
-        vb.setDestinationStation(mas);
-        vb.setDepartureTime(LocalTime.of(5, 45));
-        vb.setArrivalTime(LocalTime.of(10, 10));
-        vb.setDurationHours(4.42);
-        vb.setRunningDays("MON,TUE,WED,THU,FRI,SUN");
-        vb = trainRepository.save(vb);
+        // 4. Comprehensive Fleet of 30 Trains with realistic Multi-Stop Routes
+        // --- VANDE BHARAT FLEET ---
+        Train vb1 = registerTrainWithStops("20608", "Vande Bharat Express", "VANDE_BHARAT",
+                LocalTime.of(5, 45), LocalTime.of(10, 10), 4.42, "MON,TUE,WED,THU,FRI,SUN",
+                List.of(
+                        new StopDef(sbc, 0.0, null, LocalTime.of(5, 45)),
+                        new StopDef(kpd, 229.0, LocalTime.of(8, 30), LocalTime.of(8, 32)),
+                        new StopDef(mas, 359.0, LocalTime.of(10, 10), null)
+                ));
 
-        // Train 2: Pandian Express (TPJ -> MAS & MS)
-        Train pandian = new Train();
-        pandian.setTrainNumber("12638");
-        pandian.setTrainName("Pandian Superfast Express");
-        pandian.setTrainType("EXPRESS");
-        pandian.setSourceStation(tpj);
-        pandian.setDestinationStation(mas);
-        pandian.setDepartureTime(LocalTime.of(21, 35));
-        pandian.setArrivalTime(LocalTime.of(5, 15));
-        pandian.setDurationHours(7.67);
-        pandian.setRunningDays("MON,TUE,WED,THU,FRI,SAT,SUN");
-        pandian = trainRepository.save(pandian);
+        registerTrainWithStops("20607", "Vande Bharat Express", "VANDE_BHARAT",
+                LocalTime.of(5, 50), LocalTime.of(12, 20), 6.5, "MON,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(mas, 0.0, null, LocalTime.of(5, 50)),
+                        new StopDef(kpd, 130.0, LocalTime.of(7, 13), LocalTime.of(7, 15)),
+                        new StopDef(sbc, 359.0, LocalTime.of(10, 15), LocalTime.of(10, 20)),
+                        new StopDef(mys, 497.0, LocalTime.of(12, 20), null)
+                ));
 
-        // Train 3: Mumbai Rajdhani (NDLS -> BCT)
-        Train rajdhani = new Train();
-        rajdhani.setTrainNumber("12952");
-        rajdhani.setTrainName("Mumbai Rajdhani Express");
-        rajdhani.setTrainType("RAJDHANI");
-        rajdhani.setSourceStation(ndls);
-        rajdhani.setDestinationStation(bct);
-        rajdhani.setDepartureTime(LocalTime.of(16, 55));
-        rajdhani.setArrivalTime(LocalTime.of(8, 35));
-        rajdhani.setDurationHours(15.67);
-        rajdhani.setRunningDays("MON,TUE,WED,THU,FRI,SAT,SUN");
-        rajdhani = trainRepository.save(rajdhani);
+        registerTrainWithStops("22436", "Vande Bharat Express", "VANDE_BHARAT",
+                LocalTime.of(6, 0), LocalTime.of(14, 0), 8.0, "TUE,WED,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(ndls, 0.0, null, LocalTime.of(6, 0)),
+                        new StopDef(cnb, 440.0, LocalTime.of(10, 8), LocalTime.of(10, 12)),
+                        new StopDef(bsb, 759.0, LocalTime.of(14, 0), null)
+                ));
 
-        // 5. Train Routes
-        // 20608 Routes (SBC -> KPD -> MAS)
-        TrainRoute vbR1 = new TrainRoute(); vbR1.setTrain(vb); vbR1.setStation(sbc); vbR1.setStopSequence(1); vbR1.setDistanceFromSourceKm(0.0); vbR1.setDepartureTime(LocalTime.of(5, 45));
-        TrainRoute vbR2 = new TrainRoute(); vbR2.setTrain(vb); vbR2.setStation(kpd); vbR2.setStopSequence(2); vbR2.setDistanceFromSourceKm(229.0); vbR2.setArrivalTime(LocalTime.of(8, 30)); vbR2.setDepartureTime(LocalTime.of(8, 32));
-        TrainRoute vbR3 = new TrainRoute(); vbR3.setTrain(vb); vbR3.setStation(mas); vbR3.setStopSequence(3); vbR3.setDistanceFromSourceKm(359.0); vbR3.setArrivalTime(LocalTime.of(10, 10));
-        trainRouteRepository.saveAll(List.of(vbR1, vbR2, vbR3));
+        registerTrainWithStops("22435", "Vande Bharat Express", "VANDE_BHARAT",
+                LocalTime.of(15, 0), LocalTime.of(23, 0), 8.0, "TUE,WED,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(bsb, 0.0, null, LocalTime.of(15, 0)),
+                        new StopDef(cnb, 319.0, LocalTime.of(18, 30), LocalTime.of(18, 34)),
+                        new StopDef(ndls, 759.0, LocalTime.of(23, 0), null)
+                ));
 
-        // 12638 Routes (TPJ -> MS -> MAS)
-        TrainRoute pR1 = new TrainRoute(); pR1.setTrain(pandian); pR1.setStation(tpj); pR1.setStopSequence(1); pR1.setDistanceFromSourceKm(0.0); pR1.setDepartureTime(LocalTime.of(21, 35));
-        TrainRoute pR2 = new TrainRoute(); pR2.setTrain(pandian); pR2.setStation(ms); pR2.setStopSequence(2); pR2.setDistanceFromSourceKm(336.0); pR2.setArrivalTime(LocalTime.of(4, 55)); pR2.setDepartureTime(LocalTime.of(5, 0));
-        TrainRoute pR3 = new TrainRoute(); pR3.setTrain(pandian); pR3.setStation(mas); pR3.setStopSequence(3); pR3.setDistanceFromSourceKm(340.0); pR3.setArrivalTime(LocalTime.of(5, 15));
-        trainRouteRepository.saveAll(List.of(pR1, pR2, pR3));
+        registerTrainWithStops("20901", "Vande Bharat Express", "VANDE_BHARAT",
+                LocalTime.of(6, 10), LocalTime.of(11, 25), 5.25, "MON,TUE,WED,THU,FRI,SAT",
+                List.of(
+                        new StopDef(bct, 0.0, null, LocalTime.of(6, 10)),
+                        new StopDef(adi, 491.0, LocalTime.of(11, 25), null)
+                ));
 
-        // 12952 Routes (NDLS -> CNB -> ADI -> BCT)
-        TrainRoute rR1 = new TrainRoute(); rR1.setTrain(rajdhani); rR1.setStation(ndls); rR1.setStopSequence(1); rR1.setDistanceFromSourceKm(0.0); rR1.setDepartureTime(LocalTime.of(16, 55));
-        TrainRoute rR2 = new TrainRoute(); rR2.setTrain(rajdhani); rR2.setStation(cnb); rR2.setStopSequence(2); rR2.setDistanceFromSourceKm(440.0); rR2.setArrivalTime(LocalTime.of(21, 30)); rR2.setDepartureTime(LocalTime.of(21, 35));
-        TrainRoute rR3 = new TrainRoute(); rR3.setTrain(rajdhani); rR3.setStation(adi); rR3.setStopSequence(3); rR3.setDistanceFromSourceKm(935.0); rR3.setArrivalTime(LocalTime.of(3, 15)); rR3.setDepartureTime(LocalTime.of(3, 25));
-        TrainRoute rR4 = new TrainRoute(); rR4.setTrain(rajdhani); rR4.setStation(bct); rR4.setStopSequence(4); rR4.setDistanceFromSourceKm(1384.0); rR4.setArrivalTime(LocalTime.of(8, 35));
-        trainRouteRepository.saveAll(List.of(rR1, rR2, rR3, rR4));
+        registerTrainWithStops("20902", "Vande Bharat Express", "VANDE_BHARAT",
+                LocalTime.of(15, 0), LocalTime.of(20, 25), 5.4, "MON,TUE,WED,THU,FRI,SAT",
+                List.of(
+                        new StopDef(adi, 0.0, null, LocalTime.of(15, 0)),
+                        new StopDef(bct, 491.0, LocalTime.of(20, 25), null)
+                ));
 
-        // 6. Coaches & Seats
-        // Vande Bharat
-        Coach c1 = coachRepository.save(new Coach(vb.getId(), "C1", "CC", 78));
-        Coach c2 = coachRepository.save(new Coach(vb.getId(), "C2", "CC", 78));
-        Coach e1 = coachRepository.save(new Coach(vb.getId(), "E1", "EC", 52));
-        // Pandian
-        Coach b1 = coachRepository.save(new Coach(pandian.getId(), "B1", "3A", 64));
-        Coach b2 = coachRepository.save(new Coach(pandian.getId(), "B2", "3A", 64));
-        Coach s1 = coachRepository.save(new Coach(pandian.getId(), "S1", "SL", 72));
-        // Rajdhani
-        Coach rA1 = coachRepository.save(new Coach(rajdhani.getId(), "A1", "2A", 54));
-        Coach rB1 = coachRepository.save(new Coach(rajdhani.getId(), "B1", "3A", 64));
-        Coach rH1 = coachRepository.save(new Coach(rajdhani.getId(), "H1", "1A", 24));
+        registerTrainWithStops("20641", "Vande Bharat Express", "VANDE_BHARAT",
+                LocalTime.of(14, 20), LocalTime.of(20, 45), 6.4, "MON,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(sbc, 0.0, null, LocalTime.of(14, 20)),
+                        new StopDef(cbe, 378.0, LocalTime.of(20, 45), null)
+                ));
 
-        // Populate Seats for B1, B2 & rB1 (3A layout: LOWER, MIDDLE, UPPER, SIDE_LOWER, SIDE_UPPER)
-        BerthType[] sleeperTypes = {BerthType.LOWER, BerthType.MIDDLE, BerthType.UPPER, BerthType.LOWER, BerthType.MIDDLE, BerthType.UPPER, BerthType.SIDE_LOWER, BerthType.SIDE_UPPER};
-        for (int i = 1; i <= 64; i++) {
-            BerthType type = sleeperTypes[(i - 1) % 8];
-            int cabin = ((i - 1) / 8) + 1;
-            seatRepository.save(new Seat(b1, i, type, cabin));
-            seatRepository.save(new Seat(b2, i, type, cabin));
-            seatRepository.save(new Seat(rB1, i, type, cabin));
-        }
+        registerTrainWithStops("20642", "Vande Bharat Express", "VANDE_BHARAT",
+                LocalTime.of(5, 0), LocalTime.of(11, 30), 6.5, "MON,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(cbe, 0.0, null, LocalTime.of(5, 0)),
+                        new StopDef(sbc, 378.0, LocalTime.of(11, 30), null)
+                ));
 
-        // Populate Seats for S1 (SL sleeper layout: 72 berths)
-        for (int i = 1; i <= 72; i++) {
-            BerthType type = sleeperTypes[(i - 1) % 8];
-            int cabin = ((i - 1) / 8) + 1;
-            seatRepository.save(new Seat(s1, i, type, cabin));
-        }
+        registerTrainWithStops("20631", "Vande Bharat Express", "VANDE_BHARAT",
+                LocalTime.of(6, 0), LocalTime.of(11, 50), 5.8, "MON,TUE,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(cbe, 0.0, null, LocalTime.of(6, 0)),
+                        new StopDef(kpd, 370.0, LocalTime.of(10, 10), LocalTime.of(10, 12)),
+                        new StopDef(mas, 497.0, LocalTime.of(11, 50), null)
+                ));
 
-        // Populate Seats for C1, C2 (CC layout: WINDOW, MIDDLE, AISLE)
-        BerthType[] ccTypes = {BerthType.WINDOW, BerthType.MIDDLE, BerthType.AISLE, BerthType.AISLE, BerthType.WINDOW};
-        for (int i = 1; i <= 50; i++) {
-            BerthType type = ccTypes[(i - 1) % 5];
-            int cabin = ((i - 1) / 5) + 1;
-            seatRepository.save(new Seat(c1, i, type, cabin));
-            seatRepository.save(new Seat(c2, i, type, cabin));
-        }
+        // --- RAJDHANI FLEET ---
+        Train rajdhani = registerTrainWithStops("12952", "Mumbai Rajdhani Express", "RAJDHANI",
+                LocalTime.of(16, 55), LocalTime.of(8, 35), 15.67, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(ndls, 0.0, null, LocalTime.of(16, 55)),
+                        new StopDef(cnb, 440.0, LocalTime.of(21, 30), LocalTime.of(21, 35)),
+                        new StopDef(adi, 935.0, LocalTime.of(3, 15), LocalTime.of(3, 25)),
+                        new StopDef(bct, 1384.0, LocalTime.of(8, 35), null)
+                ));
 
-        // Populate Seats for E1 (EC layout: WINDOW, AISLE, WINDOW)
-        BerthType[] ecTypes = {BerthType.WINDOW, BerthType.AISLE, BerthType.AISLE, BerthType.WINDOW};
-        for (int i = 1; i <= 40; i++) {
-            BerthType type = ecTypes[(i - 1) % 4];
-            int cabin = ((i - 1) / 4) + 1;
-            seatRepository.save(new Seat(e1, i, type, cabin));
-        }
+        registerTrainWithStops("12951", "New Delhi Rajdhani Express", "RAJDHANI",
+                LocalTime.of(17, 0), LocalTime.of(8, 32), 15.5, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(bct, 0.0, null, LocalTime.of(17, 0)),
+                        new StopDef(adi, 449.0, LocalTime.of(22, 10), LocalTime.of(22, 20)),
+                        new StopDef(cnb, 944.0, LocalTime.of(4, 0), LocalTime.of(4, 5)),
+                        new StopDef(ndls, 1384.0, LocalTime.of(8, 32), null)
+                ));
 
-        // Populate Seats for rA1 (2A) & rH1 (1A)
-        for (int i = 1; i <= 40; i++) {
-            BerthType type = (i % 2 == 1) ? BerthType.LOWER : BerthType.UPPER;
-            seatRepository.save(new Seat(rA1, i, type, (i / 4) + 1));
-        }
-        for (int i = 1; i <= 20; i++) {
-            BerthType type = (i % 2 == 1) ? BerthType.LOWER : BerthType.UPPER;
-            seatRepository.save(new Seat(rH1, i, type, (i / 2) + 1));
-        }
+        registerTrainWithStops("12301", "Howrah Rajdhani Express", "RAJDHANI",
+                LocalTime.of(16, 50), LocalTime.of(10, 5), 17.25, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(hwh, 0.0, null, LocalTime.of(16, 50)),
+                        new StopDef(cnb, 1010.0, LocalTime.of(4, 45), LocalTime.of(4, 50)),
+                        new StopDef(ndls, 1450.0, LocalTime.of(10, 5), null)
+                ));
 
-        // 7. Demo Bookings with unique 10-digit PNR
+        registerTrainWithStops("12302", "New Delhi Howrah Rajdhani", "RAJDHANI",
+                LocalTime.of(16, 55), LocalTime.of(9, 55), 17.0, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(ndls, 0.0, null, LocalTime.of(16, 55)),
+                        new StopDef(cnb, 440.0, LocalTime.of(21, 30), LocalTime.of(21, 35)),
+                        new StopDef(hwh, 1450.0, LocalTime.of(9, 55), null)
+                ));
+
+        registerTrainWithStops("22691", "Bengaluru Rajdhani Express", "RAJDHANI",
+                LocalTime.of(20, 0), LocalTime.of(5, 30), 33.5, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(sbc, 0.0, null, LocalTime.of(20, 0)),
+                        new StopDef(sc, 621.0, LocalTime.of(7, 0), LocalTime.of(7, 15)),
+                        new StopDef(bpl, 1500.0, LocalTime.of(20, 0), LocalTime.of(20, 5)),
+                        new StopDef(ndls, 2200.0, LocalTime.of(5, 30), null)
+                ));
+
+        registerTrainWithStops("22692", "New Delhi Bengaluru Rajdhani", "RAJDHANI",
+                LocalTime.of(20, 45), LocalTime.of(6, 40), 33.9, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(ndls, 0.0, null, LocalTime.of(20, 45)),
+                        new StopDef(bpl, 700.0, LocalTime.of(5, 20), LocalTime.of(5, 25)),
+                        new StopDef(sc, 1579.0, LocalTime.of(18, 0), LocalTime.of(18, 15)),
+                        new StopDef(sbc, 2200.0, LocalTime.of(6, 40), null)
+                ));
+
+        registerTrainWithStops("12433", "Chennai Rajdhani Express", "RAJDHANI",
+                LocalTime.of(6, 10), LocalTime.of(10, 40), 28.5, "FRI,SUN",
+                List.of(
+                        new StopDef(mas, 0.0, null, LocalTime.of(6, 10)),
+                        new StopDef(bpl, 1475.0, LocalTime.of(2, 50), LocalTime.of(2, 55)),
+                        new StopDef(ndls, 2175.0, LocalTime.of(10, 40), null)
+                ));
+
+        registerTrainWithStops("12434", "New Delhi Chennai Rajdhani", "RAJDHANI",
+                LocalTime.of(15, 35), LocalTime.of(20, 45), 29.1, "WED,FRI",
+                List.of(
+                        new StopDef(ndls, 0.0, null, LocalTime.of(15, 35)),
+                        new StopDef(bpl, 700.0, LocalTime.of(23, 20), LocalTime.of(23, 25)),
+                        new StopDef(mas, 2175.0, LocalTime.of(20, 45), null)
+                ));
+
+        // --- SHATABDI FLEET ---
+        registerTrainWithStops("12007", "Chennai Mysuru Shatabdi", "SHATABDI",
+                LocalTime.of(6, 0), LocalTime.of(13, 0), 7.0, "MON,TUE,WED,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(mas, 0.0, null, LocalTime.of(6, 0)),
+                        new StopDef(kpd, 130.0, LocalTime.of(7, 38), LocalTime.of(7, 40)),
+                        new StopDef(sbc, 359.0, LocalTime.of(10, 45), LocalTime.of(10, 50)),
+                        new StopDef(mys, 497.0, LocalTime.of(13, 0), null)
+                ));
+
+        registerTrainWithStops("12008", "Mysuru Chennai Shatabdi", "SHATABDI",
+                LocalTime.of(14, 15), LocalTime.of(21, 30), 7.25, "MON,TUE,WED,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(mys, 0.0, null, LocalTime.of(14, 15)),
+                        new StopDef(sbc, 138.0, LocalTime.of(16, 15), LocalTime.of(16, 20)),
+                        new StopDef(kpd, 367.0, LocalTime.of(19, 23), LocalTime.of(19, 25)),
+                        new StopDef(mas, 497.0, LocalTime.of(21, 30), null)
+                ));
+
+        registerTrainWithStops("12028", "KSR Bengaluru Chennai Shatabdi", "SHATABDI",
+                LocalTime.of(6, 0), LocalTime.of(11, 0), 5.0, "MON,TUE,WED,THU,FRI,SUN",
+                List.of(
+                        new StopDef(sbc, 0.0, null, LocalTime.of(6, 0)),
+                        new StopDef(kpd, 229.0, LocalTime.of(9, 10), LocalTime.of(9, 12)),
+                        new StopDef(mas, 359.0, LocalTime.of(11, 0), null)
+                ));
+
+        registerTrainWithStops("12027", "Chennai KSR Bengaluru Shatabdi", "SHATABDI",
+                LocalTime.of(17, 30), LocalTime.of(22, 25), 4.9, "MON,TUE,WED,THU,FRI,SUN",
+                List.of(
+                        new StopDef(mas, 0.0, null, LocalTime.of(17, 30)),
+                        new StopDef(kpd, 130.0, LocalTime.of(19, 10), LocalTime.of(19, 12)),
+                        new StopDef(sbc, 359.0, LocalTime.of(22, 25), null)
+                ));
+
+        registerTrainWithStops("12004", "Lucknow Shatabdi Express", "SHATABDI",
+                LocalTime.of(6, 10), LocalTime.of(12, 40), 6.5, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(ndls, 0.0, null, LocalTime.of(6, 10)),
+                        new StopDef(cnb, 440.0, LocalTime.of(11, 20), LocalTime.of(11, 25)),
+                        new StopDef(lko, 512.0, LocalTime.of(12, 40), null)
+                ));
+
+        registerTrainWithStops("12003", "New Delhi Shatabdi Express", "SHATABDI",
+                LocalTime.of(15, 30), LocalTime.of(22, 20), 6.8, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(lko, 0.0, null, LocalTime.of(15, 30)),
+                        new StopDef(cnb, 72.0, LocalTime.of(16, 50), LocalTime.of(16, 55)),
+                        new StopDef(ndls, 512.0, LocalTime.of(22, 20), null)
+                ));
+
+        // --- SUPERFAST & EXPRESS FLEET ---
+        Train pandian = registerTrainWithStops("12638", "Pandian Superfast Express", "EXPRESS",
+                LocalTime.of(21, 35), LocalTime.of(5, 15), 7.67, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(tpj, 0.0, null, LocalTime.of(21, 35)),
+                        new StopDef(ms, 336.0, LocalTime.of(4, 55), LocalTime.of(5, 0)),
+                        new StopDef(mas, 340.0, LocalTime.of(5, 15), null)
+                ));
+
+        registerTrainWithStops("12637", "Pandian Superfast Express", "EXPRESS",
+                LocalTime.of(21, 40), LocalTime.of(5, 35), 7.9, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(mas, 0.0, null, LocalTime.of(21, 40)),
+                        new StopDef(ms, 4.0, LocalTime.of(21, 50), LocalTime.of(21, 55)),
+                        new StopDef(tpj, 340.0, LocalTime.of(5, 35), null)
+                ));
+
+        registerTrainWithStops("12245", "Howrah Yesvantpur Duronto", "EXPRESS",
+                LocalTime.of(10, 50), LocalTime.of(16, 0), 29.1, "TUE,WED,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(hwh, 0.0, null, LocalTime.of(10, 50)),
+                        new StopDef(sbc, 1946.0, LocalTime.of(16, 0), null)
+                ));
+
+        registerTrainWithStops("12723", "Telangana Superfast Express", "EXPRESS",
+                LocalTime.of(6, 0), LocalTime.of(7, 40), 25.6, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(hyb, 0.0, null, LocalTime.of(6, 0)),
+                        new StopDef(sc, 9.0, LocalTime.of(6, 20), LocalTime.of(6, 25)),
+                        new StopDef(bpl, 980.0, LocalTime.of(21, 10), LocalTime.of(21, 15)),
+                        new StopDef(ndls, 1677.0, LocalTime.of(7, 40), null)
+                ));
+
+        registerTrainWithStops("12724", "New Delhi Telangana Express", "EXPRESS",
+                LocalTime.of(16, 0), LocalTime.of(17, 10), 25.1, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(ndls, 0.0, null, LocalTime.of(16, 0)),
+                        new StopDef(bpl, 697.0, LocalTime.of(2, 0), LocalTime.of(2, 5)),
+                        new StopDef(sc, 1668.0, LocalTime.of(16, 40), LocalTime.of(16, 45)),
+                        new StopDef(hyb, 1677.0, LocalTime.of(17, 10), null)
+                ));
+
+        registerTrainWithStops("12137", "Punjab Mail Superfast", "EXPRESS",
+                LocalTime.of(19, 35), LocalTime.of(21, 30), 25.9, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(csmt, 0.0, null, LocalTime.of(19, 35)),
+                        new StopDef(pune, 192.0, LocalTime.of(23, 10), LocalTime.of(23, 15)),
+                        new StopDef(bpl, 1025.0, LocalTime.of(12, 10), LocalTime.of(12, 15)),
+                        new StopDef(ndls, 1540.0, LocalTime.of(21, 30), null)
+                ));
+
+        registerTrainWithStops("16589", "Rani Chennamma Express", "EXPRESS",
+                LocalTime.of(23, 0), LocalTime.of(14, 15), 15.25, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(sbc, 0.0, null, LocalTime.of(23, 0)),
+                        new StopDef(pune, 927.0, LocalTime.of(14, 15), null)
+                ));
+
+        // 5. Demo Bookings with unique 10-digit PNR
         Booking booking1 = new Booking();
         booking1.setPnrNumber("4827193056");
         booking1.setUser(rahul);
@@ -282,7 +429,7 @@ public class DataLoader implements CommandLineRunner {
 
         paymentRepository.save(new Payment(savedB2, "TXN-RAIL-2026-002", "CREDIT_CARD", 530.0, "SUCCESS"));
 
-        // 8. Demo Berth Exchange Request
+        // 6. Demo Berth Exchange Request
         BerthExchangeRequest req = new BerthExchangeRequest();
         req.setRequesterBooking(savedB2);
         req.setRequesterPassenger(pPriya);
@@ -296,6 +443,131 @@ public class DataLoader implements CommandLineRunner {
         req.setUpdatedAt(LocalDateTime.now().minusHours(3));
         exchangeRepository.save(req);
 
-        System.out.println(">>> RailConnect: Successfully populated master trains, stations, coaches, seats, and demo scenarios!");
+        System.out.println(">>> RailConnect: Successfully bootstrapped 24 stations, 30 trains, coaches, seats & demo records!");
+    }
+
+    private static class StopDef {
+        Station station;
+        double distanceKm;
+        LocalTime arr;
+        LocalTime dep;
+
+        StopDef(Station station, double distanceKm, LocalTime arr, LocalTime dep) {
+            this.station = station;
+            this.distanceKm = distanceKm;
+            this.arr = arr;
+            this.dep = dep;
+        }
+    }
+
+    private Train registerTrainWithStops(String number, String name, String type,
+                                         LocalTime dep, LocalTime arr, double duration,
+                                         String days, List<StopDef> stops) {
+        Train t = new Train();
+        t.setTrainNumber(number);
+        t.setTrainName(name);
+        t.setTrainType(type);
+        t.setSourceStation(stops.get(0).station);
+        t.setDestinationStation(stops.get(stops.size() - 1).station);
+        t.setDepartureTime(dep);
+        t.setArrivalTime(arr);
+        t.setDurationHours(duration);
+        t.setRunningDays(days);
+        t.setActive(true);
+        t = trainRepository.save(t);
+
+        List<TrainRoute> routes = new ArrayList<>();
+        for (int i = 0; i < stops.size(); i++) {
+            StopDef stop = stops.get(i);
+            TrainRoute r = new TrainRoute();
+            r.setTrain(t);
+            r.setStation(stop.station);
+            r.setStopSequence(i + 1);
+            r.setDistanceFromSourceKm(stop.distanceKm);
+            r.setArrivalTime(stop.arr);
+            r.setDepartureTime(stop.dep);
+            routes.add(r);
+        }
+        trainRouteRepository.saveAll(routes);
+
+        // Coaches & Seats
+        if ("VANDE_BHARAT".equalsIgnoreCase(type)) {
+            Coach c1 = coachRepository.save(new Coach(t.getId(), "C1", "CC", 78));
+            Coach c2 = coachRepository.save(new Coach(t.getId(), "C2", "CC", 78));
+            Coach e1 = coachRepository.save(new Coach(t.getId(), "E1", "EC", 52));
+            populateCCSeats(c1, 40);
+            populateCCSeats(c2, 40);
+            populateECSeats(e1, 24);
+        } else if ("SHATABDI".equalsIgnoreCase(type)) {
+            Coach c1 = coachRepository.save(new Coach(t.getId(), "C1", "CC", 78));
+            Coach e1 = coachRepository.save(new Coach(t.getId(), "E1", "EC", 52));
+            populateCCSeats(c1, 40);
+            populateECSeats(e1, 24);
+        } else if ("RAJDHANI".equalsIgnoreCase(type)) {
+            Coach a1 = coachRepository.save(new Coach(t.getId(), "A1", "2A", 54));
+            Coach b1 = coachRepository.save(new Coach(t.getId(), "B1", "3A", 64));
+            Coach h1 = coachRepository.save(new Coach(t.getId(), "H1", "1A", 24));
+            populateSleeperSeats(b1, 32);
+            populate2ASeats(a1, 24);
+            populate1ASeats(h1, 16);
+        } else {
+            Coach b1 = coachRepository.save(new Coach(t.getId(), "B1", "3A", 64));
+            Coach s1 = coachRepository.save(new Coach(t.getId(), "S1", "SL", 72));
+            populateSleeperSeats(b1, 32);
+            populateSleeperSeats(s1, 36);
+        }
+
+        return t;
+    }
+
+    private void populateCCSeats(Coach coach, int count) {
+        BerthType[] ccTypes = {BerthType.WINDOW, BerthType.MIDDLE, BerthType.AISLE, BerthType.AISLE, BerthType.WINDOW};
+        List<Seat> seats = new ArrayList<>();
+        for (int i = 1; i <= count; i++) {
+            BerthType type = ccTypes[(i - 1) % 5];
+            int cabin = ((i - 1) / 5) + 1;
+            seats.add(new Seat(coach, i, type, cabin));
+        }
+        seatRepository.saveAll(seats);
+    }
+
+    private void populateECSeats(Coach coach, int count) {
+        BerthType[] ecTypes = {BerthType.WINDOW, BerthType.AISLE, BerthType.AISLE, BerthType.WINDOW};
+        List<Seat> seats = new ArrayList<>();
+        for (int i = 1; i <= count; i++) {
+            BerthType type = ecTypes[(i - 1) % 4];
+            int cabin = ((i - 1) / 4) + 1;
+            seats.add(new Seat(coach, i, type, cabin));
+        }
+        seatRepository.saveAll(seats);
+    }
+
+    private void populateSleeperSeats(Coach coach, int count) {
+        BerthType[] sleeperTypes = {BerthType.LOWER, BerthType.MIDDLE, BerthType.UPPER, BerthType.LOWER, BerthType.MIDDLE, BerthType.UPPER, BerthType.SIDE_LOWER, BerthType.SIDE_UPPER};
+        List<Seat> seats = new ArrayList<>();
+        for (int i = 1; i <= count; i++) {
+            BerthType type = sleeperTypes[(i - 1) % 8];
+            int cabin = ((i - 1) / 8) + 1;
+            seats.add(new Seat(coach, i, type, cabin));
+        }
+        seatRepository.saveAll(seats);
+    }
+
+    private void populate2ASeats(Coach coach, int count) {
+        List<Seat> seats = new ArrayList<>();
+        for (int i = 1; i <= count; i++) {
+            BerthType type = (i % 2 == 1) ? BerthType.LOWER : BerthType.UPPER;
+            seats.add(new Seat(coach, i, type, (i / 4) + 1));
+        }
+        seatRepository.saveAll(seats);
+    }
+
+    private void populate1ASeats(Coach coach, int count) {
+        List<Seat> seats = new ArrayList<>();
+        for (int i = 1; i <= count; i++) {
+            BerthType type = (i % 2 == 1) ? BerthType.LOWER : BerthType.UPPER;
+            seats.add(new Seat(coach, i, type, (i / 2) + 1));
+        }
+        seatRepository.saveAll(seats);
     }
 }

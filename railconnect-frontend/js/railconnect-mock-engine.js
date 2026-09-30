@@ -8,7 +8,7 @@
  */
 
 (function () {
-  const STORAGE_KEY = 'railconnect_sim_db_v1';
+  const STORAGE_KEY = 'railconnect_sim_db_v2';
 
   function getInitialDB() {
     return {
@@ -22,26 +22,40 @@
       stations: [
         { id: 1, code: 'NDLS', name: 'New Delhi Railway Station', city: 'New Delhi', state: 'Delhi', zone: 'NR', platformCount: 16 },
         { id: 2, code: 'BCT', name: 'Mumbai Central', city: 'Mumbai', state: 'Maharashtra', zone: 'WR', platformCount: 8 },
-        { id: 3, code: 'MAS', name: 'Chennai Central', city: 'Chennai', state: 'Tamil Nadu', zone: 'SR', platformCount: 12 },
-        { id: 4, code: 'MS', name: 'Chennai Egmore', city: 'Chennai', state: 'Tamil Nadu', zone: 'SR', platformCount: 11 },
-        { id: 5, code: 'TPJ', name: 'Tiruchchirappalli Junction (Trichy)', city: 'Tiruchirappalli', state: 'Tamil Nadu', zone: 'SR', platformCount: 8 },
+        { id: 3, code: 'CSMT', name: 'Chhatrapati Shivaji Maharaj Terminus', city: 'Mumbai', state: 'Maharashtra', zone: 'CR', platformCount: 18 },
+        { id: 4, code: 'MAS', name: 'Chennai Central', city: 'Chennai', state: 'Tamil Nadu', zone: 'SR', platformCount: 12 },
+        { id: 5, code: 'MS', name: 'Chennai Egmore', city: 'Chennai', state: 'Tamil Nadu', zone: 'SR', platformCount: 11 },
         { id: 6, code: 'SBC', name: 'KSR Bengaluru City Junction', city: 'Bengaluru', state: 'Karnataka', zone: 'SWR', platformCount: 10 },
-        { id: 7, code: 'KPD', name: 'Katpadi Junction', city: 'Vellore', state: 'Tamil Nadu', zone: 'SR', platformCount: 5 },
+        { id: 7, code: 'MYS', name: 'Mysuru Junction', city: 'Mysuru', state: 'Karnataka', zone: 'SWR', platformCount: 6 },
         { id: 8, code: 'HWH', name: 'Howrah Junction', city: 'Kolkata', state: 'West Bengal', zone: 'ER', platformCount: 23 },
         { id: 9, code: 'HYB', name: 'Hyderabad Deccan', city: 'Hyderabad', state: 'Telangana', zone: 'SCR', platformCount: 6 },
-        { id: 10, code: 'ADI', name: 'Ahmedabad Junction', city: 'Ahmedabad', state: 'Gujarat', zone: 'WR', platformCount: 12 },
-        { id: 11, code: 'CNB', name: 'Kanpur Central', city: 'Kanpur', state: 'Uttar Pradesh', zone: 'NCR', platformCount: 10 }
+        { id: 10, code: 'SC', name: 'Secunderabad Junction', city: 'Hyderabad', state: 'Telangana', zone: 'SCR', platformCount: 10 },
+        { id: 11, code: 'ADI', name: 'Ahmedabad Junction', city: 'Ahmedabad', state: 'Gujarat', zone: 'WR', platformCount: 12 },
+        { id: 12, code: 'CNB', name: 'Kanpur Central', city: 'Kanpur', state: 'Uttar Pradesh', zone: 'NCR', platformCount: 10 },
+        { id: 13, code: 'BSB', name: 'Varanasi Junction', city: 'Varanasi', state: 'Uttar Pradesh', zone: 'NR', platformCount: 9 },
+        { id: 14, code: 'LKO', name: 'Lucknow Charbagh', city: 'Lucknow', state: 'Uttar Pradesh', zone: 'NR', platformCount: 9 },
+        { id: 15, code: 'PNBE', name: 'Patna Junction', city: 'Patna', state: 'Bihar', zone: 'ECR', platformCount: 10 },
+        { id: 16, code: 'TPJ', name: 'Tiruchchirappalli Junction (Trichy)', city: 'Tiruchirappalli', state: 'Tamil Nadu', zone: 'SR', platformCount: 8 },
+        { id: 17, code: 'KPD', name: 'Katpadi Junction', city: 'Vellore', state: 'Tamil Nadu', zone: 'SR', platformCount: 5 },
+        { id: 18, code: 'CBE', name: 'Coimbatore Junction', city: 'Coimbatore', state: 'Tamil Nadu', zone: 'SR', platformCount: 6 },
+        { id: 19, code: 'PUNE', name: 'Pune Junction', city: 'Pune', state: 'Maharashtra', zone: 'CR', platformCount: 6 },
+        { id: 20, code: 'JP', name: 'Jaipur Junction', city: 'Jaipur', state: 'Rajasthan', zone: 'NWR', platformCount: 8 },
+        { id: 21, code: 'BPL', name: 'Bhopal Junction', city: 'Bhopal', state: 'Madhya Pradesh', zone: 'WCR', platformCount: 6 },
+        { id: 22, code: 'TVC', name: 'Thiruvananthapuram Central', city: 'Thiruvananthapuram', state: 'Kerala', zone: 'SR', platformCount: 5 },
+        { id: 23, code: 'GKP', name: 'Gorakhpur Junction', city: 'Gorakhpur', state: 'Uttar Pradesh', zone: 'NER', platformCount: 10 },
+        { id: 24, code: 'ASR', name: 'Amritsar Junction', city: 'Amritsar', state: 'Punjab', zone: 'NR', platformCount: 7 }
       ],
       trains: [
+        // --- VANDE BHARAT FLEET ---
         {
           id: 1,
           trainNumber: '20608',
           trainName: 'Vande Bharat Express',
           trainType: 'VANDE_BHARAT',
           fromStationCode: 'SBC',
-          fromStationName: 'KSR Bengaluru City Junction',
+          fromStationName: 'KSR Bengaluru (SBC)',
           toStationCode: 'MAS',
-          toStationName: 'Chennai Central',
+          toStationName: 'Chennai Central (MAS)',
           departureTime: '05:45',
           arrivalTime: '10:10',
           durationHours: 4.42,
@@ -54,44 +68,194 @@
             { id: 3, stationCode: 'MAS', stationName: 'Chennai Central (MAS)', stopSequence: 3, distanceFromSourceKm: 359, departureTime: null, arrivalTime: '10:10' }
           ],
           availableClasses: [
-            { coachType: 'CC', availableSeats: 100, fare: 667.33, status: 'AVAILABLE (100)' },
-            { coachType: 'EC', availableSeats: 40, fare: 1140.67, status: 'AVAILABLE (40)' }
+            { coachType: 'CC', availableSeats: 114, fare: 667.33, status: 'AVAILABLE (114)' },
+            { coachType: 'EC', availableSeats: 48, fare: 1140.67, status: 'AVAILABLE (48)' }
           ]
         },
         {
           id: 2,
-          trainNumber: '12638',
-          trainName: 'Pandian Superfast Express',
-          trainType: 'EXPRESS',
-          fromStationCode: 'TPJ',
-          fromStationName: 'Tiruchchirappalli Junction (Trichy)',
-          toStationCode: 'MAS',
-          toStationName: 'Chennai Central',
-          departureTime: '21:35',
-          arrivalTime: '05:15',
-          durationHours: 7.67,
-          distanceKm: 340.0,
-          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          trainNumber: '20607',
+          trainName: 'Vande Bharat Express',
+          trainType: 'VANDE_BHARAT',
+          fromStationCode: 'MAS',
+          fromStationName: 'Chennai Central (MAS)',
+          toStationCode: 'MYS',
+          toStationName: 'Mysuru Junction (MYS)',
+          departureTime: '05:50',
+          arrivalTime: '12:20',
+          durationHours: 6.5,
+          distanceKm: 497.0,
+          runningDays: 'MON,WED,THU,FRI,SAT,SUN',
           active: true,
           routes: [
-            { id: 4, stationCode: 'TPJ', stationName: 'Tiruchchirappalli (TPJ)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '21:35', arrivalTime: null },
-            { id: 5, stationCode: 'MS', stationName: 'Chennai Egmore (MS)', stopSequence: 2, distanceFromSourceKm: 336, departureTime: '05:00', arrivalTime: '04:55' },
-            { id: 6, stationCode: 'MAS', stationName: 'Chennai Central (MAS)', stopSequence: 3, distanceFromSourceKm: 340, departureTime: null, arrivalTime: '05:15' }
+            { id: 4, stationCode: 'MAS', stationName: 'Chennai Central (MAS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '05:50', arrivalTime: null },
+            { id: 5, stationCode: 'KPD', stationName: 'Katpadi Junction (KPD)', stopSequence: 2, distanceFromSourceKm: 130, departureTime: '07:15', arrivalTime: '07:13' },
+            { id: 6, stationCode: 'SBC', stationName: 'Bengaluru (SBC)', stopSequence: 3, distanceFromSourceKm: 359, departureTime: '10:20', arrivalTime: '10:15' },
+            { id: 7, stationCode: 'MYS', stationName: 'Mysuru (MYS)', stopSequence: 4, distanceFromSourceKm: 497, departureTime: null, arrivalTime: '12:20' }
           ],
           availableClasses: [
-            { coachType: '3A', availableSeats: 64, fare: 535.50, status: 'AVAILABLE (64)' },
-            { coachType: 'SL', availableSeats: 72, fare: 203.00, status: 'AVAILABLE (72)' }
+            { coachType: 'CC', availableSeats: 98, fare: 875.00, status: 'AVAILABLE (98)' },
+            { coachType: 'EC', availableSeats: 36, fare: 1520.00, status: 'AVAILABLE (36)' }
           ]
         },
         {
           id: 3,
+          trainNumber: '22436',
+          trainName: 'Vande Bharat Express',
+          trainType: 'VANDE_BHARAT',
+          fromStationCode: 'NDLS',
+          fromStationName: 'New Delhi (NDLS)',
+          toStationCode: 'BSB',
+          toStationName: 'Varanasi Junction (BSB)',
+          departureTime: '06:00',
+          arrivalTime: '14:00',
+          durationHours: 8.0,
+          distanceKm: 759.0,
+          runningDays: 'TUE,WED,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 8, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '06:00', arrivalTime: null },
+            { id: 9, stationCode: 'CNB', stationName: 'Kanpur Central (CNB)', stopSequence: 2, distanceFromSourceKm: 440, departureTime: '10:12', arrivalTime: '10:08' },
+            { id: 10, stationCode: 'BSB', stationName: 'Varanasi (BSB)', stopSequence: 3, distanceFromSourceKm: 759, departureTime: null, arrivalTime: '14:00' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 120, fare: 1285.00, status: 'AVAILABLE (120)' },
+            { coachType: 'EC', availableSeats: 42, fare: 2415.00, status: 'AVAILABLE (42)' }
+          ]
+        },
+        {
+          id: 4,
+          trainNumber: '22435',
+          trainName: 'Vande Bharat Express',
+          trainType: 'VANDE_BHARAT',
+          fromStationCode: 'BSB',
+          fromStationName: 'Varanasi Junction (BSB)',
+          toStationCode: 'NDLS',
+          toStationName: 'New Delhi (NDLS)',
+          departureTime: '15:00',
+          arrivalTime: '23:00',
+          durationHours: 8.0,
+          distanceKm: 759.0,
+          runningDays: 'TUE,WED,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 11, stationCode: 'BSB', stationName: 'Varanasi (BSB)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '15:00', arrivalTime: null },
+            { id: 12, stationCode: 'CNB', stationName: 'Kanpur Central (CNB)', stopSequence: 2, distanceFromSourceKm: 319, departureTime: '18:34', arrivalTime: '18:30' },
+            { id: 13, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 3, distanceFromSourceKm: 759, departureTime: null, arrivalTime: '23:00' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 105, fare: 1285.00, status: 'AVAILABLE (105)' },
+            { coachType: 'EC', availableSeats: 38, fare: 2415.00, status: 'AVAILABLE (38)' }
+          ]
+        },
+        {
+          id: 5,
+          trainNumber: '20901',
+          trainName: 'Vande Bharat Express',
+          trainType: 'VANDE_BHARAT',
+          fromStationCode: 'BCT',
+          fromStationName: 'Mumbai Central (BCT)',
+          toStationCode: 'ADI',
+          toStationName: 'Ahmedabad Junction (ADI)',
+          departureTime: '06:10',
+          arrivalTime: '11:25',
+          durationHours: 5.25,
+          distanceKm: 491.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT',
+          active: true,
+          routes: [
+            { id: 14, stationCode: 'BCT', stationName: 'Mumbai Central (BCT)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '06:10', arrivalTime: null },
+            { id: 15, stationCode: 'ADI', stationName: 'Ahmedabad (ADI)', stopSequence: 2, distanceFromSourceKm: 491, departureTime: null, arrivalTime: '11:25' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 132, fare: 965.00, status: 'AVAILABLE (132)' },
+            { coachType: 'EC', availableSeats: 44, fare: 1780.00, status: 'AVAILABLE (44)' }
+          ]
+        },
+        {
+          id: 6,
+          trainNumber: '20902',
+          trainName: 'Vande Bharat Express',
+          trainType: 'VANDE_BHARAT',
+          fromStationCode: 'ADI',
+          fromStationName: 'Ahmedabad Junction (ADI)',
+          toStationCode: 'BCT',
+          toStationName: 'Mumbai Central (BCT)',
+          departureTime: '15:00',
+          arrivalTime: '20:25',
+          durationHours: 5.4,
+          distanceKm: 491.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT',
+          active: true,
+          routes: [
+            { id: 16, stationCode: 'ADI', stationName: 'Ahmedabad (ADI)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '15:00', arrivalTime: null },
+            { id: 17, stationCode: 'BCT', stationName: 'Mumbai Central (BCT)', stopSequence: 2, distanceFromSourceKm: 491, departureTime: null, arrivalTime: '20:25' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 110, fare: 965.00, status: 'AVAILABLE (110)' },
+            { coachType: 'EC', availableSeats: 40, fare: 1780.00, status: 'AVAILABLE (40)' }
+          ]
+        },
+        {
+          id: 7,
+          trainNumber: '20641',
+          trainName: 'Vande Bharat Express',
+          trainType: 'VANDE_BHARAT',
+          fromStationCode: 'SBC',
+          fromStationName: 'KSR Bengaluru (SBC)',
+          toStationCode: 'CBE',
+          toStationName: 'Coimbatore Junction (CBE)',
+          departureTime: '14:20',
+          arrivalTime: '20:45',
+          durationHours: 6.4,
+          distanceKm: 378.0,
+          runningDays: 'MON,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 18, stationCode: 'SBC', stationName: 'Bengaluru (SBC)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '14:20', arrivalTime: null },
+            { id: 19, stationCode: 'CBE', stationName: 'Coimbatore (CBE)', stopSequence: 2, distanceFromSourceKm: 378, departureTime: null, arrivalTime: '20:45' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 95, fare: 780.00, status: 'AVAILABLE (95)' },
+            { coachType: 'EC', availableSeats: 32, fare: 1450.00, status: 'AVAILABLE (32)' }
+          ]
+        },
+        {
+          id: 8,
+          trainNumber: '20631',
+          trainName: 'Vande Bharat Express',
+          trainType: 'VANDE_BHARAT',
+          fromStationCode: 'CBE',
+          fromStationName: 'Coimbatore Junction (CBE)',
+          toStationCode: 'MAS',
+          toStationName: 'Chennai Central (MAS)',
+          departureTime: '06:00',
+          arrivalTime: '11:50',
+          durationHours: 5.8,
+          distanceKm: 497.0,
+          runningDays: 'MON,TUE,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 20, stationCode: 'CBE', stationName: 'Coimbatore (CBE)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '06:00', arrivalTime: null },
+            { id: 21, stationCode: 'KPD', stationName: 'Katpadi (KPD)', stopSequence: 2, distanceFromSourceKm: 370, departureTime: '10:12', arrivalTime: '10:10' },
+            { id: 22, stationCode: 'MAS', stationName: 'Chennai Central (MAS)', stopSequence: 3, distanceFromSourceKm: 497, departureTime: null, arrivalTime: '11:50' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 104, fare: 885.00, status: 'AVAILABLE (104)' },
+            { coachType: 'EC', availableSeats: 35, fare: 1620.00, status: 'AVAILABLE (35)' }
+          ]
+        },
+
+        // --- RAJDHANI FLEET ---
+        {
+          id: 9,
           trainNumber: '12952',
           trainName: 'Mumbai Rajdhani Express',
           trainType: 'RAJDHANI',
           fromStationCode: 'NDLS',
-          fromStationName: 'New Delhi Railway Station',
+          fromStationName: 'New Delhi (NDLS)',
           toStationCode: 'BCT',
-          toStationName: 'Mumbai Central',
+          toStationName: 'Mumbai Central (BCT)',
           departureTime: '16:55',
           arrivalTime: '08:35',
           durationHours: 15.67,
@@ -99,15 +263,328 @@
           runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
           active: true,
           routes: [
-            { id: 7, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '16:55', arrivalTime: null },
-            { id: 8, stationCode: 'CNB', stationName: 'Kanpur Central (CNB)', stopSequence: 2, distanceFromSourceKm: 440, departureTime: '21:35', arrivalTime: '21:30' },
-            { id: 9, stationCode: 'ADI', stationName: 'Ahmedabad Jn (ADI)', stopSequence: 3, distanceFromSourceKm: 935, departureTime: '03:25', arrivalTime: '03:15' },
-            { id: 10, stationCode: 'BCT', stationName: 'Mumbai Central (BCT)', stopSequence: 4, distanceFromSourceKm: 1384, departureTime: null, arrivalTime: '08:35' }
+            { id: 23, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '16:55', arrivalTime: null },
+            { id: 24, stationCode: 'CNB', stationName: 'Kanpur Central (CNB)', stopSequence: 2, distanceFromSourceKm: 440, departureTime: '21:35', arrivalTime: '21:30' },
+            { id: 25, stationCode: 'ADI', stationName: 'Ahmedabad Jn (ADI)', stopSequence: 3, distanceFromSourceKm: 935, departureTime: '03:25', arrivalTime: '03:15' },
+            { id: 26, stationCode: 'BCT', stationName: 'Mumbai Central (BCT)', stopSequence: 4, distanceFromSourceKm: 1384, departureTime: null, arrivalTime: '08:35' }
           ],
           availableClasses: [
             { coachType: '2A', availableSeats: 40, fare: 3182.97, status: 'AVAILABLE (40)' },
             { coachType: '3A', availableSeats: 64, fare: 2227.89, status: 'AVAILABLE (64)' },
             { coachType: '1A', availableSeats: 20, fare: 4646.67, status: 'AVAILABLE (20)' }
+          ]
+        },
+        {
+          id: 10,
+          trainNumber: '12951',
+          trainName: 'New Delhi Rajdhani Express',
+          trainType: 'RAJDHANI',
+          fromStationCode: 'BCT',
+          fromStationName: 'Mumbai Central (BCT)',
+          toStationCode: 'NDLS',
+          toStationName: 'New Delhi (NDLS)',
+          departureTime: '17:00',
+          arrivalTime: '08:32',
+          durationHours: 15.5,
+          distanceKm: 1384.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 27, stationCode: 'BCT', stationName: 'Mumbai Central (BCT)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '17:00', arrivalTime: null },
+            { id: 28, stationCode: 'ADI', stationName: 'Ahmedabad Jn (ADI)', stopSequence: 2, distanceFromSourceKm: 449, departureTime: '22:20', arrivalTime: '22:10' },
+            { id: 29, stationCode: 'CNB', stationName: 'Kanpur Central (CNB)', stopSequence: 3, distanceFromSourceKm: 944, departureTime: '04:05', arrivalTime: '04:00' },
+            { id: 30, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 4, distanceFromSourceKm: 1384, departureTime: null, arrivalTime: '08:32' }
+          ],
+          availableClasses: [
+            { coachType: '2A', availableSeats: 48, fare: 3182.97, status: 'AVAILABLE (48)' },
+            { coachType: '3A', availableSeats: 70, fare: 2227.89, status: 'AVAILABLE (70)' },
+            { coachType: '1A', availableSeats: 18, fare: 4646.67, status: 'AVAILABLE (18)' }
+          ]
+        },
+        {
+          id: 11,
+          trainNumber: '12301',
+          trainName: 'Howrah Rajdhani Express',
+          trainType: 'RAJDHANI',
+          fromStationCode: 'HWH',
+          fromStationName: 'Howrah Junction (HWH)',
+          toStationCode: 'NDLS',
+          toStationName: 'New Delhi (NDLS)',
+          departureTime: '16:50',
+          arrivalTime: '10:05',
+          durationHours: 17.25,
+          distanceKm: 1450.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 31, stationCode: 'HWH', stationName: 'Howrah (HWH)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '16:50', arrivalTime: null },
+            { id: 32, stationCode: 'CNB', stationName: 'Kanpur Central (CNB)', stopSequence: 2, distanceFromSourceKm: 1010, departureTime: '04:50', arrivalTime: '04:45' },
+            { id: 33, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 3, distanceFromSourceKm: 1450, departureTime: null, arrivalTime: '10:05' }
+          ],
+          availableClasses: [
+            { coachType: '2A', availableSeats: 52, fare: 3250.00, status: 'AVAILABLE (52)' },
+            { coachType: '3A', availableSeats: 80, fare: 2310.00, status: 'AVAILABLE (80)' },
+            { coachType: '1A', availableSeats: 16, fare: 4850.00, status: 'AVAILABLE (16)' }
+          ]
+        },
+        {
+          id: 12,
+          trainNumber: '22691',
+          trainName: 'Bengaluru Rajdhani Express',
+          trainType: 'RAJDHANI',
+          fromStationCode: 'SBC',
+          fromStationName: 'KSR Bengaluru (SBC)',
+          toStationCode: 'NDLS',
+          toStationName: 'New Delhi (NDLS)',
+          departureTime: '20:00',
+          arrivalTime: '05:30',
+          durationHours: 33.5,
+          distanceKm: 2200.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 34, stationCode: 'SBC', stationName: 'Bengaluru (SBC)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '20:00', arrivalTime: null },
+            { id: 35, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 2, distanceFromSourceKm: 621, departureTime: '07:15', arrivalTime: '07:00' },
+            { id: 36, stationCode: 'BPL', stationName: 'Bhopal (BPL)', stopSequence: 3, distanceFromSourceKm: 1500, departureTime: '20:05', arrivalTime: '20:00' },
+            { id: 37, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 4, distanceFromSourceKm: 2200, departureTime: null, arrivalTime: '05:30' }
+          ],
+          availableClasses: [
+            { coachType: '2A', availableSeats: 45, fare: 4520.00, status: 'AVAILABLE (45)' },
+            { coachType: '3A', availableSeats: 90, fare: 3180.00, status: 'AVAILABLE (90)' },
+            { coachType: '1A', availableSeats: 14, fare: 6540.00, status: 'AVAILABLE (14)' }
+          ]
+        },
+        {
+          id: 13,
+          trainNumber: '12433',
+          trainName: 'Chennai Rajdhani Express',
+          trainType: 'RAJDHANI',
+          fromStationCode: 'MAS',
+          fromStationName: 'Chennai Central (MAS)',
+          toStationCode: 'NDLS',
+          toStationName: 'New Delhi (NDLS)',
+          departureTime: '06:10',
+          arrivalTime: '10:40',
+          durationHours: 28.5,
+          distanceKm: 2175.0,
+          runningDays: 'FRI,SUN',
+          active: true,
+          routes: [
+            { id: 38, stationCode: 'MAS', stationName: 'Chennai Central (MAS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '06:10', arrivalTime: null },
+            { id: 39, stationCode: 'BPL', stationName: 'Bhopal (BPL)', stopSequence: 2, distanceFromSourceKm: 1475, departureTime: '02:55', arrivalTime: '02:50' },
+            { id: 40, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 3, distanceFromSourceKm: 2175, departureTime: null, arrivalTime: '10:40' }
+          ],
+          availableClasses: [
+            { coachType: '2A', availableSeats: 40, fare: 4480.00, status: 'AVAILABLE (40)' },
+            { coachType: '3A', availableSeats: 75, fare: 3150.00, status: 'AVAILABLE (75)' },
+            { coachType: '1A', availableSeats: 12, fare: 6490.00, status: 'AVAILABLE (12)' }
+          ]
+        },
+
+        // --- SHATABDI FLEET ---
+        {
+          id: 14,
+          trainNumber: '12007',
+          trainName: 'Chennai Mysuru Shatabdi Express',
+          trainType: 'SHATABDI',
+          fromStationCode: 'MAS',
+          fromStationName: 'Chennai Central (MAS)',
+          toStationCode: 'MYS',
+          toStationName: 'Mysuru Junction (MYS)',
+          departureTime: '06:00',
+          arrivalTime: '13:00',
+          durationHours: 7.0,
+          distanceKm: 497.0,
+          runningDays: 'MON,TUE,WED,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 41, stationCode: 'MAS', stationName: 'Chennai Central (MAS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '06:00', arrivalTime: null },
+            { id: 42, stationCode: 'KPD', stationName: 'Katpadi (KPD)', stopSequence: 2, distanceFromSourceKm: 130, departureTime: '07:40', arrivalTime: '07:38' },
+            { id: 43, stationCode: 'SBC', stationName: 'Bengaluru (SBC)', stopSequence: 3, distanceFromSourceKm: 359, departureTime: '10:50', arrivalTime: '10:45' },
+            { id: 44, stationCode: 'MYS', stationName: 'Mysuru (MYS)', stopSequence: 4, distanceFromSourceKm: 497, departureTime: null, arrivalTime: '13:00' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 110, fare: 720.00, status: 'AVAILABLE (110)' },
+            { coachType: 'EC', availableSeats: 34, fare: 1380.00, status: 'AVAILABLE (34)' }
+          ]
+        },
+        {
+          id: 15,
+          trainNumber: '12028',
+          trainName: 'KSR Bengaluru Chennai Shatabdi',
+          trainType: 'SHATABDI',
+          fromStationCode: 'SBC',
+          fromStationName: 'KSR Bengaluru (SBC)',
+          toStationCode: 'MAS',
+          toStationName: 'Chennai Central (MAS)',
+          departureTime: '06:00',
+          arrivalTime: '11:00',
+          durationHours: 5.0,
+          distanceKm: 359.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SUN',
+          active: true,
+          routes: [
+            { id: 45, stationCode: 'SBC', stationName: 'Bengaluru (SBC)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '06:00', arrivalTime: null },
+            { id: 46, stationCode: 'KPD', stationName: 'Katpadi (KPD)', stopSequence: 2, distanceFromSourceKm: 229, departureTime: '09:12', arrivalTime: '09:10' },
+            { id: 47, stationCode: 'MAS', stationName: 'Chennai Central (MAS)', stopSequence: 3, distanceFromSourceKm: 359, departureTime: null, arrivalTime: '11:00' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 125, fare: 585.00, status: 'AVAILABLE (125)' },
+            { coachType: 'EC', availableSeats: 40, fare: 1120.00, status: 'AVAILABLE (40)' }
+          ]
+        },
+        {
+          id: 16,
+          trainNumber: '12004',
+          trainName: 'Lucknow Shatabdi Express',
+          trainType: 'SHATABDI',
+          fromStationCode: 'NDLS',
+          fromStationName: 'New Delhi (NDLS)',
+          toStationCode: 'LKO',
+          toStationName: 'Lucknow Charbagh (LKO)',
+          departureTime: '06:10',
+          arrivalTime: '12:40',
+          durationHours: 6.5,
+          distanceKm: 512.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 48, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '06:10', arrivalTime: null },
+            { id: 49, stationCode: 'CNB', stationName: 'Kanpur Central (CNB)', stopSequence: 2, distanceFromSourceKm: 440, departureTime: '11:25', arrivalTime: '11:20' },
+            { id: 50, stationCode: 'LKO', stationName: 'Lucknow (LKO)', stopSequence: 3, distanceFromSourceKm: 512, departureTime: null, arrivalTime: '12:40' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 130, fare: 840.00, status: 'AVAILABLE (130)' },
+            { coachType: 'EC', availableSeats: 42, fare: 1590.00, status: 'AVAILABLE (42)' }
+          ]
+        },
+
+        // --- SUPERFAST & EXPRESS FLEET ---
+        {
+          id: 17,
+          trainNumber: '12638',
+          trainName: 'Pandian Superfast Express',
+          trainType: 'EXPRESS',
+          fromStationCode: 'TPJ',
+          fromStationName: 'Tiruchchirappalli (TPJ)',
+          toStationCode: 'MAS',
+          toStationName: 'Chennai Central (MAS)',
+          departureTime: '21:35',
+          arrivalTime: '05:15',
+          durationHours: 7.67,
+          distanceKm: 340.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 51, stationCode: 'TPJ', stationName: 'Tiruchchirappalli (TPJ)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '21:35', arrivalTime: null },
+            { id: 52, stationCode: 'MS', stationName: 'Chennai Egmore (MS)', stopSequence: 2, distanceFromSourceKm: 336, departureTime: '05:00', arrivalTime: '04:55' },
+            { id: 53, stationCode: 'MAS', stationName: 'Chennai Central (MAS)', stopSequence: 3, distanceFromSourceKm: 340, departureTime: null, arrivalTime: '05:15' }
+          ],
+          availableClasses: [
+            { coachType: '3A', availableSeats: 64, fare: 535.50, status: 'AVAILABLE (64)' },
+            { coachType: 'SL', availableSeats: 72, fare: 203.00, status: 'AVAILABLE (72)' }
+          ]
+        },
+        {
+          id: 18,
+          trainNumber: '12245',
+          trainName: 'Howrah Yesvantpur Duronto',
+          trainType: 'EXPRESS',
+          fromStationCode: 'HWH',
+          fromStationName: 'Howrah Junction (HWH)',
+          toStationCode: 'SBC',
+          toStationName: 'KSR Bengaluru (SBC)',
+          departureTime: '10:50',
+          arrivalTime: '16:00',
+          durationHours: 29.1,
+          distanceKm: 1946.0,
+          runningDays: 'TUE,WED,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 54, stationCode: 'HWH', stationName: 'Howrah (HWH)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '10:50', arrivalTime: null },
+            { id: 55, stationCode: 'SBC', stationName: 'Bengaluru (SBC)', stopSequence: 2, distanceFromSourceKm: 1946, departureTime: null, arrivalTime: '16:00' }
+          ],
+          availableClasses: [
+            { coachType: '3A', availableSeats: 88, fare: 2620.00, status: 'AVAILABLE (88)' },
+            { coachType: '2A', availableSeats: 44, fare: 3710.00, status: 'AVAILABLE (44)' },
+            { coachType: 'SL', availableSeats: 120, fare: 995.00, status: 'AVAILABLE (120)' }
+          ]
+        },
+        {
+          id: 19,
+          trainNumber: '12723',
+          trainName: 'Telangana Superfast Express',
+          trainType: 'EXPRESS',
+          fromStationCode: 'HYB',
+          fromStationName: 'Hyderabad Deccan (HYB)',
+          toStationCode: 'NDLS',
+          toStationName: 'New Delhi (NDLS)',
+          departureTime: '06:00',
+          arrivalTime: '07:40',
+          durationHours: 25.6,
+          distanceKm: 1677.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 56, stationCode: 'HYB', stationName: 'Hyderabad (HYB)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '06:00', arrivalTime: null },
+            { id: 57, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 2, distanceFromSourceKm: 9, departureTime: '06:25', arrivalTime: '06:20' },
+            { id: 58, stationCode: 'BPL', stationName: 'Bhopal (BPL)', stopSequence: 3, distanceFromSourceKm: 980, departureTime: '21:15', arrivalTime: '21:10' },
+            { id: 59, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 4, distanceFromSourceKm: 1677, departureTime: null, arrivalTime: '07:40' }
+          ],
+          availableClasses: [
+            { coachType: '3A', availableSeats: 70, fare: 2280.00, status: 'AVAILABLE (70)' },
+            { coachType: '2A', availableSeats: 36, fare: 3260.00, status: 'AVAILABLE (36)' },
+            { coachType: 'SL', availableSeats: 110, fare: 860.00, status: 'AVAILABLE (110)' }
+          ]
+        },
+        {
+          id: 20,
+          trainNumber: '12137',
+          trainName: 'Punjab Mail Superfast',
+          trainType: 'EXPRESS',
+          fromStationCode: 'CSMT',
+          fromStationName: 'Mumbai CSMT',
+          toStationCode: 'NDLS',
+          toStationName: 'New Delhi (NDLS)',
+          departureTime: '19:35',
+          arrivalTime: '21:30',
+          durationHours: 25.9,
+          distanceKm: 1540.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 60, stationCode: 'CSMT', stationName: 'Mumbai (CSMT)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '19:35', arrivalTime: null },
+            { id: 61, stationCode: 'PUNE', stationName: 'Pune (PUNE)', stopSequence: 2, distanceFromSourceKm: 192, departureTime: '23:15', arrivalTime: '23:10' },
+            { id: 62, stationCode: 'BPL', stationName: 'Bhopal (BPL)', stopSequence: 3, distanceFromSourceKm: 1025, departureTime: '12:15', arrivalTime: '12:10' },
+            { id: 63, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 4, distanceFromSourceKm: 1540, departureTime: null, arrivalTime: '21:30' }
+          ],
+          availableClasses: [
+            { coachType: '3A', availableSeats: 65, fare: 2140.00, status: 'AVAILABLE (65)' },
+            { coachType: 'SL', availableSeats: 96, fare: 790.00, status: 'AVAILABLE (96)' }
+          ]
+        },
+        {
+          id: 21,
+          trainNumber: '16589',
+          trainName: 'Rani Chennamma Express',
+          trainType: 'EXPRESS',
+          fromStationCode: 'SBC',
+          fromStationName: 'KSR Bengaluru (SBC)',
+          toStationCode: 'PUNE',
+          toStationName: 'Pune Junction (PUNE)',
+          departureTime: '23:00',
+          arrivalTime: '14:15',
+          durationHours: 15.25,
+          distanceKm: 927.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 64, stationCode: 'SBC', stationName: 'Bengaluru (SBC)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '23:00', arrivalTime: null },
+            { id: 65, stationCode: 'PUNE', stationName: 'Pune (PUNE)', stopSequence: 2, distanceFromSourceKm: 927, departureTime: null, arrivalTime: '14:15' }
+          ],
+          availableClasses: [
+            { coachType: '3A', availableSeats: 58, fare: 1340.00, status: 'AVAILABLE (58)' },
+            { coachType: 'SL', availableSeats: 82, fare: 490.00, status: 'AVAILABLE (82)' }
           ]
         }
       ],
