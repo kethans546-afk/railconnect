@@ -84,6 +84,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/pnr/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/weather/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tickets/qr/**", "/api/tickets/qr").permitAll()
+                        .requestMatchers("/api/ai/**").permitAll()
                         .requestMatchers("/api/bookings/create", "/api/bookings/cancel/**", "/api/bookings/my").permitAll()
                         .requestMatchers("/", "/index.html", "/*.html", "/css/**", "/js/**", "/assets/**", "/i18n/**", "/h2-console/**", "/favicon.ico", "/error").permitAll()
 

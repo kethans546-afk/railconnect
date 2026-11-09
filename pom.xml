@@ -20,6 +20,7 @@
         <module>railconnect-weather</module>
         <module>railconnect-berth-exchange</module>
         <module>railconnect-admin</module>
+        <module>railconnect-ai</module>
         <module>railconnect-backend</module>
     </modules>
 

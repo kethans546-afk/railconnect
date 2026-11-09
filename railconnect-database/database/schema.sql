@@ -334,3 +334,53 @@ CREATE TABLE audit_logs (
     INDEX idx_audit_user (user_id),
     INDEX idx_audit_action (action)
 ) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------------------------
+-- 19. AI_CHAT_HISTORY TABLE
+-- -----------------------------------------------------------------------------
+CREATE TABLE ai_chat_history (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NULL,
+    session_id VARCHAR(100) NOT NULL,
+    message TEXT NOT NULL,
+    response TEXT NOT NULL,
+    language VARCHAR(20) NOT NULL DEFAULT 'en',
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_chat_user_id (user_id),
+    INDEX idx_chat_session_id (session_id),
+    INDEX idx_chat_timestamp (timestamp)
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------------------------
+-- 20. AI_VOICE_HISTORY TABLE
+-- -----------------------------------------------------------------------------
+CREATE TABLE ai_voice_history (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NULL,
+    session_id VARCHAR(100) NOT NULL,
+    recognized_text TEXT NOT NULL,
+    response_text TEXT NOT NULL,
+    language VARCHAR(20) NOT NULL DEFAULT 'en',
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_voice_user_id (user_id),
+    INDEX idx_voice_session_id (session_id),
+    INDEX idx_voice_timestamp (timestamp)
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------------------------
+-- 21. USER_LANGUAGE_PREFERENCE TABLE
+-- -----------------------------------------------------------------------------
+CREATE TABLE user_language_preference (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NULL UNIQUE,
+    session_id VARCHAR(100) NULL,
+    preferred_language VARCHAR(20) NOT NULL DEFAULT 'en',
+    voice_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_lang_pref_user (user_id),
+    INDEX idx_lang_pref_session (session_id)
+) ENGINE=InnoDB;

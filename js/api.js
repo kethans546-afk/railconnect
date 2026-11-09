@@ -158,6 +158,102 @@ const Api = {
       return mock.getDB().exchanges;
     }
 
+    // --- AI Multilingual Chatbot & Voice Assistant Endpoints ---
+    if (endpoint === '/ai/supported-languages') {
+      return [
+        { code: 'en', name: 'English', nativeName: 'English', bcp47: 'en-IN' },
+        { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', bcp47: 'hi-IN' },
+        { code: 'te', name: 'Telugu', nativeName: 'తెలుగు', bcp47: 'te-IN' },
+        { code: 'ta', name: 'Tamil', nativeName: 'தமிழ்', bcp47: 'ta-IN' },
+        { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ', bcp47: 'kn-IN' },
+        { code: 'ml', name: 'Malayalam', nativeName: 'മലയാളം', bcp47: 'ml-IN' },
+        { code: 'bn', name: 'Bengali', nativeName: 'বাংলা', bcp47: 'bn-IN' },
+        { code: 'mr', name: 'Marathi', nativeName: 'मराठी', bcp47: 'mr-IN' }
+      ];
+    }
+    if (endpoint === '/ai/language/detect') {
+      const text = body.text || '';
+      let code = 'en';
+      if (/[\u0C00-\u0C7F]/.test(text)) code = 'te';
+      else if (/[\u0B80-\u0BFF]/.test(text)) code = 'ta';
+      else if (/[\u0C80-\u0CFF]/.test(text)) code = 'kn';
+      else if (/[\u0D00-\u0D7F]/.test(text)) code = 'ml';
+      else if (/[\u0980-\u09FF]/.test(text)) code = 'bn';
+      else if (/[\u0900-\u097F]/.test(text)) code = 'hi';
+      return { languageCode: code, detectedScript: code.toUpperCase(), confidence: 0.95 };
+    }
+    if (endpoint === '/ai/chat') {
+      const msg = (body.message || '').toLowerCase();
+      const lang = body.language || 'en';
+      let reply = '';
+      let intent = 'GENERAL_QUERY';
+      let trainCards = [];
+
+      if (msg.includes('train') || msg.includes('search') || msg.includes('ರೈಲು') || msg.includes('ரயில்') || msg.includes('రైలు') || msg.includes('ट्रेन')) {
+        intent = 'TRAIN_SEARCH';
+        trainCards = [
+          { trainNumber: '20608', trainName: 'Vande Bharat Express', departureTime: '06:00', arrivalTime: '10:40', durationHours: '4h 40m', availableSeats: 48, fare: 950 },
+          { trainNumber: '12008', trainName: 'Shatabdi Express', departureTime: '15:15', arrivalTime: '20:10', durationHours: '4h 55m', availableSeats: 32, fare: 870 }
+        ];
+        if (lang === 'te') reply = 'మీ కోసం 2 ప్రీమియం రైళ్లు అందుబాటులో ఉన్నాయి:\n1. 20608 వందే భారత్ ఎక్స్‌ప్రెస్ (ఉదయం 06:00, 48 సీట్లు లభ్యం)\n2. 12008 శతాబ్ది ఎక్స్‌ప్రెస్ (మధ్యాహ్నం 15:15, 32 సీట్లు లభ్యం)';
+        else if (lang === 'hi') reply = 'आपके लिए 2 प्रीमियम ट्रेनें उपलब्ध हैं:\n1. 20608 वंदे भारत एक्सप्रेस (06:00, 48 सीटें उपलब्ध)\n2. 12008 शताब्दी एक्सप्रेस (15:15, 32 सीटें उपलब्ध)';
+        else if (lang === 'ta') reply = 'உங்களுக்காக 2 விரைவு ரயில்கள் கிடைக்கின்றன:\n1. 20608 வந்தே பாரத் எக்ஸ்பிரஸ் (காலை 06:00, 48 இருக்கைகள்)\n2. 12008 சதாப்தி எக்ஸ்பிரஸ் (மாலை 15:15, 32 இருக்கைகள்)';
+        else if (lang === 'kn') reply = 'ನಿಮಗಾಗಿ 2 ಪ್ರೀಮಿಯಂ ರೈಲುಗಳು ಲಭ್ಯವಿವೆ:\n1. 20608 ವಂದೇ ಭಾರತ್ ಎಕ್ಸ್‌ಪ್ರೆಸ್ (ಬೆಳಿಗ್ಗೆ 06:00, 48 ಸೀಟುಗಳು ಲಭ್ಯ)\n2. 12008 ಶತಾಬ್ದಿ ಎಕ್ಸ್‌ಪ್ರೆಸ್ (ಮಧ್ಯಾಹ್ನ 15:15, 32 ಸೀಟುಗಳು ಲಭ್ಯ)';
+        else reply = 'Found 2 premium express trains for your corridor:\n1. 20608 Vande Bharat Express (Departs 06:00, 48 Seats Available)\n2. 12008 Shatabdi Express (Departs 15:15, 32 Seats Available)';
+      } else if (msg.includes('pnr') || msg.includes('status')) {
+        intent = 'PNR_STATUS';
+        reply = lang === 'te' ? 'పిఎన్‌ఆర్ విచారణ: మీ 10 అంకెల పిఎన్‌ఆర్ నంబర్‌ను పంపండి, మీ బుకింగ్ మరియు సీటు వివరాలను నేను తక్షణమే తనిఖీ చేస్తాను.' :
+                lang === 'hi' ? 'पीएनआर स्थिति: कृपया अपना 10 अंकों का पीएनआर नंबर दर्ज करें। मैं तुरंत आपकी सीट और कोच स्थिति दिखाऊंगा।' :
+                'PNR Status: Please provide your 10-digit PNR number to check live confirmation, coach, and berth allocation.';
+      } else if (msg.includes('weather') || msg.includes('rain') || msg.includes('వాతావరణ') || msg.includes('मौसम') || msg.includes('வானிலை')) {
+        intent = 'WEATHER_ALERT';
+        reply = lang === 'te' ? 'ప్రయాణ మార్గ వాతావరణం: తిరుచ్చిలో 32°C సాధారణం, చెన్నైలో వర్షం సూచన (80% వర్షపాతం, 29°C). ప్రయాణానికి గొడుగు సిద్ధం చేసుకోండి.' :
+                lang === 'hi' ? 'मार्ग मौसम चेतावनी: तिरुचि में 32°C सामान्य है, चेन्नई में भारी बारिश का अलर्ट (80% वर्षा, 29°C) है। कृपया सावधानी बरतें।' :
+                'Route Weather Advisory: Trichy (32°C Clear) ➔ Chennai Central (29°C Rain Warning, 80% precipitation). Have a safe journey!';
+      } else if (msg.includes('berth') || msg.includes('exchange') || msg.includes('swap') || msg.includes('बर्थ') || msg.includes('బర్త్')) {
+        intent = 'BERTH_EXCHANGE';
+        reply = lang === 'te' ? 'బర్త్ ఎక్స్‌చేంజ్: రైల్‌కనెక్ట్ P2P వ్యవస్థ ద్వారా మీ రైలులోని ఇతర ప్రయాణికులతో మీ లోయర్/అప్పర్ బర్త్‌ను పరస్పర సమ్మతితో మార్చుకోవచ్చు.' :
+                'RailConnect P2P Berth Exchange lets confirmed passengers propose and accept seat swaps within the same coach.';
+      } else {
+        reply = lang === 'te' ? 'నమస్కారం! నేను రైల్‌కనెక్ట్ AI అసిస్టెంట్. రైలు శోధన, పిఎన్‌ఆర్, సీట్ల లభ్యత మరియు వాతావరణం గురించి సహాయం చేయగలను.' :
+                lang === 'hi' ? 'नमस्ते! मैं रेलकनेक्ट एआई सहायक हूँ। ट्रेन खोज, पीएनआर स्थिति, सीट उपलब्धता एवं मौसम अलर्ट के लिए पूछें।' :
+                lang === 'ta' ? 'வணக்கம்! நான் ரயில் கனெக்ட் AI உதவியாளர். ரயில் தேடல், பிஎன்ஆர், மற்றும் இருக்கை விவரங்களுக்கு கேளுங்கள்.' :
+                lang === 'kn' ? 'ನಮಸ್ಕಾರ! ನಾನು ರೈಲ್‌ಕನೆಕ್ಟ್ AI ಸಹಾಯಕ. ರೈಲು ಹುಡುಕಾಟ, ಪಿಎನ್‌ಆರ್ ಮತ್ತು ಹವಾಮಾನಕ್ಕಾಗಿ ಕೇಳಿ.' :
+                lang === 'ml' ? 'നമസ്കാരം! ഞാൻ റെയിൽകണക്റ്റ് AI അസിസ്റ്റന്റാണ്. ട്രെയിൻ തിരയൽ, പിഎൻആർ, സീറ്റ് ലഭ്യത എന്നിവയ്ക്ക് എന്നോട് ചോദിക്കാം.' :
+                lang === 'bn' ? 'নমস্কার! আমি রেলকানেক্ট এআই সহায়ক। ট্রেন অনুসন্ধান, পিএনআর স্থিতি ও আবহাওয়া সতর্কতার জন্য আমাকে জিজ্ঞাসা করুন।' :
+                lang === 'mr' ? 'नमस्कार! मी रेलकनेक्ट एआय सहाय्यक आहे. गाडी शोधणे, पीएनआर स्थिती आणि हवामानासाठी मला विचारा.' :
+                'Hello! Welcome to RailConnect AI Assistant. I can help you search trains, check bookings, live PNR, seat availability, weather advisories, and booking rules.';
+      }
+
+      return {
+        reply,
+        language: lang,
+        intent,
+        trains: trainCards,
+        executionMode: 'AUTONOMOUS_DOMAIN_AI',
+        suggestedNextQueries: ['Search trains Chennai to Trichy', 'PNR Status 8492019482', 'Route Weather Advisory', 'Tatkal Booking Rules']
+      };
+    }
+    if (endpoint === '/ai/voice/process') {
+      return this.dispatchMock('/ai/chat', { body: JSON.stringify({ message: body.recognizedText, language: body.language, sessionId: body.sessionId }) });
+    }
+    if (endpoint === '/ai/voice/speak') {
+      return {
+        text: body.text,
+        language: body.language || 'en',
+        bcp47Code: 'en-IN',
+        audioBase64: null,
+        audioMimeType: 'audio/wav',
+        status: 'SPEECH_SYNTHESIZED_FALLBACK'
+      };
+    }
+    if (endpoint.startsWith('/ai/chat/history')) {
+      return [];
+    }
+    if (endpoint === '/ai/language/preference') {
+      return { preferredLanguage: 'en', voiceEnabled: true };
+    }
+
     return { status: 'OK', simulated: true };
   },
 
@@ -391,6 +487,73 @@ const Api = {
 
   async getQRCode(text, size = 200) {
     return await this.request(`/tickets/qr?text=${encodeURIComponent(text)}&size=${size}`);
+  },
+
+  // ==========================================================================
+  // AI Multilingual Chatbot & Voice Assistant Client Methods
+  // ==========================================================================
+  async sendChatMessage(chatData) {
+    return await this.request('/ai/chat', {
+      method: 'POST',
+      body: JSON.stringify(chatData)
+    });
+  },
+
+  async getChatHistory(sessionId) {
+    return await this.request(`/ai/chat/history?sessionId=${encodeURIComponent(sessionId)}`);
+  },
+
+  async clearChatHistory(sessionId) {
+    return await this.request(`/ai/chat/history?sessionId=${encodeURIComponent(sessionId)}`, {
+      method: 'DELETE'
+    });
+  },
+
+  async getSupportedLanguages() {
+    return await this.request('/ai/supported-languages');
+  },
+
+  async detectLanguage(text) {
+    return await this.request('/ai/language/detect', {
+      method: 'POST',
+      body: JSON.stringify({ text })
+    });
+  },
+
+  async getLanguagePreference() {
+    return await this.request('/ai/language/preference');
+  },
+
+  async saveLanguagePreference(preferenceData) {
+    return await this.request('/ai/language/preference', {
+      method: 'POST',
+      body: JSON.stringify(preferenceData)
+    });
+  },
+
+  async transcribeVoice(audioData) {
+    return await this.request('/ai/voice/transcribe', {
+      method: 'POST',
+      body: JSON.stringify(audioData)
+    });
+  },
+
+  async speakVoice(speakData) {
+    return await this.request('/ai/voice/speak', {
+      method: 'POST',
+      body: JSON.stringify(speakData)
+    });
+  },
+
+  async processVoice(voiceProcessData) {
+    return await this.request('/ai/voice/process', {
+      method: 'POST',
+      body: JSON.stringify(voiceProcessData)
+    });
+  },
+
+  async getVoiceHistory(sessionId) {
+    return await this.request(`/ai/voice/history?sessionId=${encodeURIComponent(sessionId)}`);
   }
 };
 

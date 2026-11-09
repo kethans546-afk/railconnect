@@ -39,6 +39,11 @@
             <artifactId>railconnect-admin</artifactId>
             <version>1.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.railconnect</groupId>
+            <artifactId>railconnect-ai</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
         <!-- Spring Boot Starters -->
         <dependency>
