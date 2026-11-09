@@ -88,7 +88,7 @@
         <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('NDLS', 'BCT')">👑 Delhi ➔ Mumbai (NDLS-BCT)</button>
         <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('HWH', 'NDLS')">⭐ Kolkata ➔ Delhi (HWH-NDLS)</button>
         <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('MAS', 'MYS')">⚡ Chennai ➔ Mysuru (MAS-MYS)</button>
-        <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('', '')">🌐 View All 21 Trains</button>
+        <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('', '')">🌐 View All 42 Fleet Trains</button>
       </div>
     </div>
 
@@ -238,7 +238,7 @@
               <button class="btn btn-secondary btn-sm" onclick="quickSearch('SBC', 'MAS')">⚡ Bengaluru ➔ Chennai</button>
               <button class="btn btn-secondary btn-sm" onclick="quickSearch('TPJ', 'MAS')">🚆 Trichy ➔ Chennai</button>
               <button class="btn btn-secondary btn-sm" onclick="quickSearch('NDLS', 'BCT')">👑 Delhi ➔ Mumbai</button>
-              <button class="btn btn-secondary btn-sm" onclick="quickSearch('', '')">🌐 Show All 21 Trains</button>
+              <button class="btn btn-secondary btn-sm" onclick="quickSearch('', '')">🌐 Show All 42 Fleet Trains</button>
             </div>
           </div>
         `;
@@ -258,9 +258,13 @@
               { coachType: 'SL', availableSeats: 120, fare: 280.0, status: 'AVAILABLE (120)' }
             ];
 
-        const filteredClasses = classFilter === 'ALL'
+        let filteredClasses = classFilter === 'ALL'
           ? availableClasses
           : availableClasses.filter(c => c.coachType === classFilter);
+
+        if (filteredClasses.length === 0) {
+          filteredClasses = availableClasses;
+        }
 
         const classButtons = filteredClasses.map(c => `
           <div style="border:1px solid var(--border); border-radius:var(--radius-md); padding:10px 14px; background:#fff; text-align:center; min-width:110px;">

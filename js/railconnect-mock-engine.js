@@ -8,40 +8,53 @@
  */
 
 (function () {
-  const STORAGE_KEY = 'railconnect_sim_db_v3';
+  const STORAGE_KEY = 'railconnect_sim_db_v4';
 
-  function normalizeStation(input) {
-    if (!input) return '';
-    let str = input.trim().toUpperCase();
+    const STATION_CLUSTERS = {
+    'CHENNAI': ['MAS', 'MS'], 'MADRAS': ['MAS', 'MS'], 'MAS': ['MAS', 'MS'], 'MS': ['MAS', 'MS'],
+    'MUMBAI': ['BCT', 'CSMT'], 'BOMBAY': ['BCT', 'CSMT'], 'BCT': ['BCT', 'CSMT'], 'CSMT': ['BCT', 'CSMT'],
+    'HYDERABAD': ['HYB', 'SC'], 'SECUNDERABAD': ['HYB', 'SC'], 'HYB': ['HYB', 'SC'], 'SC': ['HYB', 'SC'],
+    'DELHI': ['NDLS'], 'NEW DELHI': ['NDLS'], 'NDLS': ['NDLS'],
+    'BENGALURU': ['SBC'], 'BANGALORE': ['SBC'], 'KSR': ['SBC'], 'SBC': ['SBC'],
+    'TRICHY': ['TPJ'], 'TIRUCHIRAPPALLI': ['TPJ'], 'TIRUCHCHIRAPPALLI': ['TPJ'], 'TPJ': ['TPJ'],
+    'KOLKATA': ['HWH'], 'CALCUTTA': ['HWH'], 'HOWRAH': ['HWH'], 'HWH': ['HWH'],
+    'AHMEDABAD': ['ADI'], 'ADI': ['ADI'],
+    'VARANASI': ['BSB'], 'BANARAS': ['BSB'], 'BSB': ['BSB'],
+    'KANPUR': ['CNB'], 'CNB': ['CNB'],
+    'LUCKNOW': ['LKO'], 'LKO': ['LKO'],
+    'PATNA': ['PNBE'], 'PNBE': ['PNBE'],
+    'COIMBATORE': ['CBE'], 'CBE': ['CBE'],
+    'KATPADI': ['KPD'], 'VELLORE': ['KPD'], 'KPD': ['KPD'],
+    'MYSORE': ['MYS'], 'MYSURU': ['MYS'], 'MYS': ['MYS'],
+    'PUNE': ['PUNE'],
+    'JAIPUR': ['JP'], 'JP': ['JP'],
+    'BHOPAL': ['BPL'], 'BPL': ['BPL'],
+    'TRIVANDRUM': ['TVC'], 'THIRUVANANTHAPURAM': ['TVC'], 'TVC': ['TVC'],
+    'KOZHIKODE': ['CLT'], 'CALICUT': ['CLT'], 'CLT': ['CLT'],
+    'ERNAKULAM': ['ERN'], 'KOCHI': ['ERN'], 'ERN': ['ERN'],
+    'AMRITSAR': ['ASR'], 'ASR': ['ASR'],
+    'GORAKHPUR': ['GKP'], 'GKP': ['GKP']
+  };
+
+  function getClusterCodes(input) {
+    if (!input) return [];
+    const str = input.trim().toUpperCase();
     const parenMatch = str.match(/\(([A-Za-z]{2,5})\)/);
-    if (parenMatch) return parenMatch[1].toUpperCase();
+    if (parenMatch && STATION_CLUSTERS[parenMatch[1]]) return STATION_CLUSTERS[parenMatch[1]];
+    if (parenMatch) return [parenMatch[1]];
 
     const prefixMatch = str.match(/^([A-Za-z]{2,5})\b/);
-    if (prefixMatch && ['SBC','MAS','MS','NDLS','BCT','CSMT','TPJ','KPD','CBE','HWH','HYB','SC','MYS','JP','PUNE','ADI','BSB','CNB','LKO','PNBE','TVC','GKP','ASR'].includes(prefixMatch[1].toUpperCase())) {
-      return prefixMatch[1].toUpperCase();
-    }
+    if (prefixMatch && STATION_CLUSTERS[prefixMatch[1]]) return STATION_CLUSTERS[prefixMatch[1]];
 
-    const aliases = {
-      'BANGALORE': 'SBC', 'BENGALURU': 'SBC', 'KSR': 'SBC',
-      'CHENNAI': 'MAS', 'MADRAS': 'MAS', 'EGMORE': 'MS',
-      'DELHI': 'NDLS', 'NEW DELHI': 'NDLS',
-      'MUMBAI': 'BCT', 'BOMBAY': 'BCT', 'CSMT': 'CSMT',
-      'TRICHY': 'TPJ', 'TIRUCHIRAPPALLI': 'TPJ', 'TIRUCHCHIRAPPALLI': 'TPJ',
-      'KOLKATA': 'HWH', 'CALCUTTA': 'HWH', 'HOWRAH': 'HWH',
-      'HYDERABAD': 'HYB', 'SECUNDERABAD': 'SC',
-      'AHMEDABAD': 'ADI', 'VARANASI': 'BSB', 'BANARAS': 'BSB',
-      'KANPUR': 'CNB', 'LUCKNOW': 'LKO', 'PATNA': 'PNBE',
-      'COIMBATORE': 'CBE', 'KATPADI': 'KPD', 'VELLORE': 'KPD',
-      'MYSORE': 'MYS', 'MYSURU': 'MYS', 'PUNE': 'PUNE',
-      'JAIPUR': 'JP', 'BHOPAL': 'BPL',
-      'TRIVANDRUM': 'TVC', 'THIRUVANANTHAPURAM': 'TVC',
-      'AMRITSAR': 'ASR', 'GORAKHPUR': 'GKP'
-    };
-
-    for (const [alias, code] of Object.entries(aliases)) {
-      if (str.includes(alias)) return code;
+    for (const [key, codes] of Object.entries(STATION_CLUSTERS)) {
+      if (str.includes(key)) return codes;
     }
-    return str;
+    return [str];
+  }
+
+  function normalizeStation(input) {
+    const codes = getClusterCodes(input);
+    return codes.length > 0 ? codes[0] : (input || '').trim().toUpperCase();
   }
 
   function getInitialDB() {
@@ -621,6 +634,547 @@
             { coachType: 'SL', availableSeats: 82, fare: 490.00, status: 'AVAILABLE (82)' }
           ]
         }
+,
+        // --- EXPANDED FLEET: BI-DIRECTIONAL & MAJOR CORRIDORS ---
+        {
+          id: 22,
+          trainNumber: '12637',
+          trainName: 'Pandian Superfast Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'MAS',
+          fromStationName: 'Chennai Central (MAS)',
+          toStationCode: 'TPJ',
+          toStationName: 'Tiruchchirappalli (TPJ)',
+          departureTime: '21:40',
+          arrivalTime: '04:15',
+          durationHours: 6.58,
+          distanceKm: 340.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 101, stationCode: 'MAS', stationName: 'Chennai Central (MAS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '21:40', arrivalTime: null },
+            { id: 102, stationCode: 'MS', stationName: 'Chennai Egmore (MS)', stopSequence: 2, distanceFromSourceKm: 5, departureTime: '22:00', arrivalTime: '21:55' },
+            { id: 103, stationCode: 'TPJ', stationName: 'Tiruchchirappalli (TPJ)', stopSequence: 3, distanceFromSourceKm: 340, departureTime: null, arrivalTime: '04:15' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 12, fare: 1450.00, status: 'AVAILABLE (12)' },
+            { coachType: '2A', availableSeats: 32, fare: 980.00, status: 'AVAILABLE (32)' },
+            { coachType: '3A', availableSeats: 74, fare: 535.50, status: 'AVAILABLE (74)' },
+            { coachType: 'SL', availableSeats: 140, fare: 215.00, status: 'AVAILABLE (140)' }
+          ]
+        },
+        {
+          id: 23,
+          trainNumber: '12635',
+          trainName: 'Vaigai Superfast Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'MS',
+          fromStationName: 'Chennai Egmore (MS)',
+          toStationCode: 'TPJ',
+          toStationName: 'Tiruchchirappalli (TPJ)',
+          departureTime: '13:50',
+          arrivalTime: '18:55',
+          durationHours: 5.08,
+          distanceKm: 336.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 104, stationCode: 'MS', stationName: 'Chennai Egmore (MS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '13:50', arrivalTime: null },
+            { id: 105, stationCode: 'MAS', stationName: 'Chennai Central (MAS)', stopSequence: 2, distanceFromSourceKm: 5, departureTime: '14:05', arrivalTime: '14:00' },
+            { id: 106, stationCode: 'TPJ', stationName: 'Tiruchchirappalli (TPJ)', stopSequence: 3, distanceFromSourceKm: 336, departureTime: null, arrivalTime: '18:55' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 90, fare: 485.00, status: 'AVAILABLE (90)' },
+            { coachType: '2S', availableSeats: 180, fare: 135.00, status: 'AVAILABLE (180)' }
+          ]
+        },
+        {
+          id: 24,
+          trainNumber: '20605',
+          trainName: 'Tirunelveli Vande Bharat Express',
+          trainType: 'VANDE_BHARAT',
+          fromStationCode: 'MS',
+          fromStationName: 'Chennai Egmore (MS)',
+          toStationCode: 'TPJ',
+          toStationName: 'Tiruchchirappalli (TPJ)',
+          departureTime: '14:50',
+          arrivalTime: '18:40',
+          durationHours: 3.83,
+          distanceKm: 336.0,
+          runningDays: 'MON,TUE,WED,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 107, stationCode: 'MS', stationName: 'Chennai Egmore (MS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '14:50', arrivalTime: null },
+            { id: 108, stationCode: 'MAS', stationName: 'Chennai Central (MAS)', stopSequence: 2, distanceFromSourceKm: 5, departureTime: '15:05', arrivalTime: '15:00' },
+            { id: 109, stationCode: 'TPJ', stationName: 'Tiruchchirappalli (TPJ)', stopSequence: 3, distanceFromSourceKm: 336, departureTime: null, arrivalTime: '18:40' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 112, fare: 885.00, status: 'AVAILABLE (112)' },
+            { coachType: 'EC', availableSeats: 44, fare: 1640.00, status: 'AVAILABLE (44)' }
+          ]
+        },
+        {
+          id: 25,
+          trainNumber: '12008',
+          trainName: 'Shatabdi Express',
+          trainType: 'SHATABDI',
+          fromStationCode: 'MYS',
+          fromStationName: 'Mysuru (MYS)',
+          toStationCode: 'MAS',
+          toStationName: 'Chennai Central (MAS)',
+          departureTime: '14:15',
+          arrivalTime: '21:30',
+          durationHours: 7.25,
+          distanceKm: 497.0,
+          runningDays: 'MON,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 110, stationCode: 'MYS', stationName: 'Mysuru (MYS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '14:15', arrivalTime: null },
+            { id: 111, stationCode: 'SBC', stationName: 'Bengaluru (SBC)', stopSequence: 2, distanceFromSourceKm: 138, departureTime: '16:25', arrivalTime: '16:20' },
+            { id: 112, stationCode: 'KPD', stationName: 'Katpadi Junction (KPD)', stopSequence: 3, distanceFromSourceKm: 367, departureTime: '19:25', arrivalTime: '19:23' },
+            { id: 113, stationCode: 'MAS', stationName: 'Chennai Central (MAS)', stopSequence: 4, distanceFromSourceKm: 497, departureTime: null, arrivalTime: '21:30' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 96, fare: 880.00, status: 'AVAILABLE (96)' },
+            { coachType: 'EC', availableSeats: 38, fare: 1530.00, status: 'AVAILABLE (38)' }
+          ]
+        },
+        {
+          id: 26,
+          trainNumber: '12675',
+          trainName: 'Kovai Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'MAS',
+          fromStationName: 'Chennai Central (MAS)',
+          toStationCode: 'CBE',
+          toStationName: 'Coimbatore Junction (CBE)',
+          departureTime: '06:10',
+          arrivalTime: '14:05',
+          durationHours: 7.92,
+          distanceKm: 494.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 114, stationCode: 'MAS', stationName: 'Chennai Central (MAS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '06:10', arrivalTime: null },
+            { id: 115, stationCode: 'KPD', stationName: 'Katpadi Junction (KPD)', stopSequence: 2, distanceFromSourceKm: 130, departureTime: '07:55', arrivalTime: '07:53' },
+            { id: 116, stationCode: 'CBE', stationName: 'Coimbatore Junction (CBE)', stopSequence: 3, distanceFromSourceKm: 494, departureTime: null, arrivalTime: '14:05' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 104, fare: 590.00, status: 'AVAILABLE (104)' },
+            { coachType: '2S', availableSeats: 210, fare: 180.00, status: 'AVAILABLE (210)' }
+          ]
+        },
+        {
+          id: 27,
+          trainNumber: '12676',
+          trainName: 'Kovai Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'CBE',
+          fromStationName: 'Coimbatore Junction (CBE)',
+          toStationCode: 'MAS',
+          toStationName: 'Chennai Central (MAS)',
+          departureTime: '15:15',
+          arrivalTime: '23:15',
+          durationHours: 8.0,
+          distanceKm: 494.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 117, stationCode: 'CBE', stationName: 'Coimbatore Junction (CBE)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '15:15', arrivalTime: null },
+            { id: 118, stationCode: 'KPD', stationName: 'Katpadi Junction (KPD)', stopSequence: 2, distanceFromSourceKm: 364, departureTime: '21:20', arrivalTime: '21:18' },
+            { id: 119, stationCode: 'MAS', stationName: 'Chennai Central (MAS)', stopSequence: 3, distanceFromSourceKm: 494, departureTime: null, arrivalTime: '23:15' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 88, fare: 590.00, status: 'AVAILABLE (88)' },
+            { coachType: '2S', availableSeats: 195, fare: 180.00, status: 'AVAILABLE (195)' }
+          ]
+        },
+        {
+          id: 28,
+          trainNumber: '12302',
+          trainName: 'Howrah Rajdhani Express',
+          trainType: 'RAJDHANI',
+          fromStationCode: 'NDLS',
+          fromStationName: 'New Delhi (NDLS)',
+          toStationCode: 'HWH',
+          toStationName: 'Howrah Junction (HWH)',
+          departureTime: '16:50',
+          arrivalTime: '09:55',
+          durationHours: 17.08,
+          distanceKm: 1451.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SUN',
+          active: true,
+          routes: [
+            { id: 120, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '16:50', arrivalTime: null },
+            { id: 121, stationCode: 'CNB', stationName: 'Kanpur Central (CNB)', stopSequence: 2, distanceFromSourceKm: 440, departureTime: '21:37', arrivalTime: '21:32' },
+            { id: 122, stationCode: 'BSB', stationName: 'Varanasi Junction (BSB)', stopSequence: 3, distanceFromSourceKm: 760, departureTime: '01:35', arrivalTime: '01:25' },
+            { id: 123, stationCode: 'HWH', stationName: 'Howrah Junction (HWH)', stopSequence: 4, distanceFromSourceKm: 1451, departureTime: null, arrivalTime: '09:55' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 14, fare: 4890.00, status: 'AVAILABLE (14)' },
+            { coachType: '2A', availableSeats: 36, fare: 2950.00, status: 'AVAILABLE (36)' },
+            { coachType: '3A', availableSeats: 92, fare: 2140.00, status: 'AVAILABLE (92)' }
+          ]
+        },
+        {
+          id: 29,
+          trainNumber: '12434',
+          trainName: 'Chennai Rajdhani Express',
+          trainType: 'RAJDHANI',
+          fromStationCode: 'NDLS',
+          fromStationName: 'New Delhi (NDLS)',
+          toStationCode: 'MAS',
+          toStationName: 'Chennai Central (MAS)',
+          departureTime: '15:35',
+          arrivalTime: '20:45',
+          durationHours: 29.17,
+          distanceKm: 2175.0,
+          runningDays: 'WED,FRI',
+          active: true,
+          routes: [
+            { id: 124, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '15:35', arrivalTime: null },
+            { id: 125, stationCode: 'BPL', stationName: 'Bhopal Junction (BPL)', stopSequence: 2, distanceFromSourceKm: 700, departureTime: '23:50', arrivalTime: '23:45' },
+            { id: 126, stationCode: 'SC', stationName: 'Secunderabad Junction (SC)', stopSequence: 3, distanceFromSourceKm: 1475, departureTime: '08:55', arrivalTime: '08:50' },
+            { id: 127, stationCode: 'MAS', stationName: 'Chennai Central (MAS)', stopSequence: 4, distanceFromSourceKm: 2175, departureTime: null, arrivalTime: '20:45' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 10, fare: 5650.00, status: 'AVAILABLE (10)' },
+            { coachType: '2A', availableSeats: 28, fare: 3480.00, status: 'AVAILABLE (28)' },
+            { coachType: '3A', availableSeats: 80, fare: 2590.00, status: 'AVAILABLE (80)' }
+          ]
+        },
+        {
+          id: 30,
+          trainNumber: '22692',
+          trainName: 'Bengaluru Rajdhani Express',
+          trainType: 'RAJDHANI',
+          fromStationCode: 'NDLS',
+          fromStationName: 'New Delhi (NDLS)',
+          toStationCode: 'SBC',
+          toStationName: 'KSR Bengaluru (SBC)',
+          departureTime: '20:45',
+          arrivalTime: '05:20',
+          durationHours: 32.58,
+          distanceKm: 2365.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 128, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '20:45', arrivalTime: null },
+            { id: 129, stationCode: 'BPL', stationName: 'Bhopal Junction (BPL)', stopSequence: 2, distanceFromSourceKm: 700, departureTime: '05:30', arrivalTime: '05:25' },
+            { id: 130, stationCode: 'SC', stationName: 'Secunderabad Junction (SC)', stopSequence: 3, distanceFromSourceKm: 1475, departureTime: '15:15', arrivalTime: '15:10' },
+            { id: 131, stationCode: 'SBC', stationName: 'Bengaluru (SBC)', stopSequence: 4, distanceFromSourceKm: 2365, departureTime: null, arrivalTime: '05:20' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 12, fare: 5880.00, status: 'AVAILABLE (12)' },
+            { coachType: '2A', availableSeats: 32, fare: 3620.00, status: 'AVAILABLE (32)' },
+            { coachType: '3A', availableSeats: 86, fare: 2680.00, status: 'AVAILABLE (86)' }
+          ]
+        },
+        {
+          id: 31,
+          trainNumber: '12724',
+          trainName: 'Telangana Superfast Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'NDLS',
+          fromStationName: 'New Delhi (NDLS)',
+          toStationCode: 'HYB',
+          toStationName: 'Hyderabad Deccan (HYB)',
+          departureTime: '16:00',
+          arrivalTime: '17:10',
+          durationHours: 25.17,
+          distanceKm: 1672.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 132, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '16:00', arrivalTime: null },
+            { id: 133, stationCode: 'BPL', stationName: 'Bhopal Junction (BPL)', stopSequence: 2, distanceFromSourceKm: 700, departureTime: '00:25', arrivalTime: '00:20' },
+            { id: 134, stationCode: 'SC', stationName: 'Secunderabad Junction (SC)', stopSequence: 3, distanceFromSourceKm: 1665, departureTime: '16:00', arrivalTime: '15:55' },
+            { id: 135, stationCode: 'HYB', stationName: 'Hyderabad Deccan (HYB)', stopSequence: 4, distanceFromSourceKm: 1672, departureTime: null, arrivalTime: '17:10' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 8, fare: 4120.00, status: 'AVAILABLE (8)' },
+            { coachType: '2A', availableSeats: 26, fare: 2450.00, status: 'AVAILABLE (26)' },
+            { coachType: '3A', availableSeats: 68, fare: 1710.00, status: 'AVAILABLE (68)' },
+            { coachType: 'SL', availableSeats: 120, fare: 655.00, status: 'AVAILABLE (120)' }
+          ]
+        },
+        {
+          id: 32,
+          trainNumber: '12124',
+          trainName: 'Deccan Queen Superfast',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'PUNE',
+          fromStationName: 'Pune Junction (PUNE)',
+          toStationCode: 'CSMT',
+          toStationName: 'Mumbai CSMT (CSMT)',
+          departureTime: '07:15',
+          arrivalTime: '10:25',
+          durationHours: 3.17,
+          distanceKm: 192.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 136, stationCode: 'PUNE', stationName: 'Pune Junction (PUNE)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '07:15', arrivalTime: null },
+            { id: 137, stationCode: 'CSMT', stationName: 'Mumbai CSMT (CSMT)', stopSequence: 2, distanceFromSourceKm: 192, departureTime: null, arrivalTime: '10:25' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 110, fare: 390.00, status: 'AVAILABLE (110)' },
+            { coachType: '2S', availableSeats: 230, fare: 110.00, status: 'AVAILABLE (230)' }
+          ]
+        },
+        {
+          id: 33,
+          trainNumber: '12123',
+          trainName: 'Deccan Queen Superfast',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'CSMT',
+          fromStationName: 'Mumbai CSMT (CSMT)',
+          toStationCode: 'PUNE',
+          toStationName: 'Pune Junction (PUNE)',
+          departureTime: '17:10',
+          arrivalTime: '20:25',
+          durationHours: 3.25,
+          distanceKm: 192.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 138, stationCode: 'CSMT', stationName: 'Mumbai CSMT (CSMT)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '17:10', arrivalTime: null },
+            { id: 139, stationCode: 'PUNE', stationName: 'Pune Junction (PUNE)', stopSequence: 2, distanceFromSourceKm: 192, departureTime: null, arrivalTime: '20:25' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 98, fare: 390.00, status: 'AVAILABLE (98)' },
+            { coachType: '2S', availableSeats: 215, fare: 110.00, status: 'AVAILABLE (215)' }
+          ]
+        },
+        {
+          id: 34,
+          trainNumber: '12785',
+          trainName: 'Kacheguda Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'SBC',
+          fromStationName: 'KSR Bengaluru (SBC)',
+          toStationCode: 'HYB',
+          toStationName: 'Hyderabad Deccan (HYB)',
+          departureTime: '18:20',
+          arrivalTime: '05:40',
+          durationHours: 11.33,
+          distanceKm: 618.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 140, stationCode: 'SBC', stationName: 'Bengaluru (SBC)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '18:20', arrivalTime: null },
+            { id: 141, stationCode: 'SC', stationName: 'Secunderabad Junction (SC)', stopSequence: 2, distanceFromSourceKm: 610, departureTime: '05:15', arrivalTime: '05:10' },
+            { id: 142, stationCode: 'HYB', stationName: 'Hyderabad Deccan (HYB)', stopSequence: 3, distanceFromSourceKm: 618, departureTime: null, arrivalTime: '05:40' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 10, fare: 2150.00, status: 'AVAILABLE (10)' },
+            { coachType: '2A', availableSeats: 30, fare: 1290.00, status: 'AVAILABLE (30)' },
+            { coachType: '3A', availableSeats: 80, fare: 910.00, status: 'AVAILABLE (80)' },
+            { coachType: 'SL', availableSeats: 150, fare: 350.00, status: 'AVAILABLE (150)' }
+          ]
+        },
+        {
+          id: 35,
+          trainNumber: '12786',
+          trainName: 'Bengaluru Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'HYB',
+          fromStationName: 'Hyderabad Deccan (HYB)',
+          toStationCode: 'SBC',
+          toStationName: 'KSR Bengaluru (SBC)',
+          departureTime: '19:05',
+          arrivalTime: '06:25',
+          durationHours: 11.33,
+          distanceKm: 618.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 143, stationCode: 'HYB', stationName: 'Hyderabad Deccan (HYB)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '19:05', arrivalTime: null },
+            { id: 144, stationCode: 'SC', stationName: 'Secunderabad Junction (SC)', stopSequence: 2, distanceFromSourceKm: 8, departureTime: '19:35', arrivalTime: '19:30' },
+            { id: 145, stationCode: 'SBC', stationName: 'Bengaluru (SBC)', stopSequence: 3, distanceFromSourceKm: 618, departureTime: null, arrivalTime: '06:25' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 12, fare: 2150.00, status: 'AVAILABLE (12)' },
+            { coachType: '2A', availableSeats: 34, fare: 1290.00, status: 'AVAILABLE (34)' },
+            { coachType: '3A', availableSeats: 82, fare: 910.00, status: 'AVAILABLE (82)' },
+            { coachType: 'SL', availableSeats: 160, fare: 350.00, status: 'AVAILABLE (160)' }
+          ]
+        },
+        {
+          id: 36,
+          trainNumber: '12003',
+          trainName: 'Lucknow Shatabdi Express',
+          trainType: 'SHATABDI',
+          fromStationCode: 'LKO',
+          fromStationName: 'Lucknow Charbagh (LKO)',
+          toStationCode: 'NDLS',
+          toStationName: 'New Delhi (NDLS)',
+          departureTime: '15:30',
+          arrivalTime: '22:25',
+          durationHours: 6.92,
+          distanceKm: 512.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 146, stationCode: 'LKO', stationName: 'Lucknow Charbagh (LKO)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '15:30', arrivalTime: null },
+            { id: 147, stationCode: 'CNB', stationName: 'Kanpur Central (CNB)', stopSequence: 2, distanceFromSourceKm: 72, departureTime: '16:55', arrivalTime: '16:50' },
+            { id: 148, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 3, distanceFromSourceKm: 512, departureTime: null, arrivalTime: '22:25' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 108, fare: 980.00, status: 'AVAILABLE (108)' },
+            { coachType: 'EC', availableSeats: 42, fare: 1720.00, status: 'AVAILABLE (42)' }
+          ]
+        },
+        {
+          id: 37,
+          trainNumber: '12394',
+          trainName: 'Sampoorna Kranti Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'NDLS',
+          fromStationName: 'New Delhi (NDLS)',
+          toStationCode: 'PNBE',
+          toStationName: 'Patna Junction (PNBE)',
+          departureTime: '17:30',
+          arrivalTime: '06:50',
+          durationHours: 13.33,
+          distanceKm: 1002.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 149, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '17:30', arrivalTime: null },
+            { id: 150, stationCode: 'CNB', stationName: 'Kanpur Central (CNB)', stopSequence: 2, distanceFromSourceKm: 440, departureTime: '22:27', arrivalTime: '22:22' },
+            { id: 151, stationCode: 'PNBE', stationName: 'Patna Junction (PNBE)', stopSequence: 3, distanceFromSourceKm: 1002, departureTime: null, arrivalTime: '06:50' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 10, fare: 3290.00, status: 'AVAILABLE (10)' },
+            { coachType: '2A', availableSeats: 32, fare: 1940.00, status: 'AVAILABLE (32)' },
+            { coachType: '3A', availableSeats: 88, fare: 1360.00, status: 'AVAILABLE (88)' },
+            { coachType: 'SL', availableSeats: 160, fare: 520.00, status: 'AVAILABLE (160)' }
+          ]
+        },
+        {
+          id: 38,
+          trainNumber: '12393',
+          trainName: 'Sampoorna Kranti Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'PNBE',
+          fromStationName: 'Patna Junction (PNBE)',
+          toStationCode: 'NDLS',
+          toStationName: 'New Delhi (NDLS)',
+          departureTime: '19:25',
+          arrivalTime: '07:55',
+          durationHours: 12.5,
+          distanceKm: 1002.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 152, stationCode: 'PNBE', stationName: 'Patna Junction (PNBE)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '19:25', arrivalTime: null },
+            { id: 153, stationCode: 'CNB', stationName: 'Kanpur Central (CNB)', stopSequence: 2, distanceFromSourceKm: 562, departureTime: '02:30', arrivalTime: '02:25' },
+            { id: 154, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 3, distanceFromSourceKm: 1002, departureTime: null, arrivalTime: '07:55' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 12, fare: 3290.00, status: 'AVAILABLE (12)' },
+            { coachType: '2A', availableSeats: 30, fare: 1940.00, status: 'AVAILABLE (30)' },
+            { coachType: '3A', availableSeats: 85, fare: 1360.00, status: 'AVAILABLE (85)' },
+            { coachType: 'SL', availableSeats: 155, fare: 520.00, status: 'AVAILABLE (155)' }
+          ]
+        },
+        {
+          id: 39,
+          trainNumber: '20633',
+          trainName: 'Kasaragod Vande Bharat Express',
+          trainType: 'VANDE_BHARAT',
+          fromStationCode: 'TVC',
+          fromStationName: 'Thiruvananthapuram (TVC)',
+          toStationCode: 'CLT',
+          toStationName: 'Kozhikode (CLT)',
+          departureTime: '05:20',
+          arrivalTime: '11:03',
+          durationHours: 5.72,
+          distanceKm: 398.0,
+          runningDays: 'MON,TUE,WED,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 155, stationCode: 'TVC', stationName: 'Thiruvananthapuram Central (TVC)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '05:20', arrivalTime: null },
+            { id: 156, stationCode: 'ERN', stationName: 'Ernakulam Town (ERN)', stopSequence: 2, distanceFromSourceKm: 206, departureTime: '08:20', arrivalTime: '08:17' },
+            { id: 157, stationCode: 'CLT', stationName: 'Kozhikode (CLT)', stopSequence: 3, distanceFromSourceKm: 398, departureTime: null, arrivalTime: '11:03' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 110, fare: 950.00, status: 'AVAILABLE (110)' },
+            { coachType: 'EC', availableSeats: 40, fare: 1780.00, status: 'AVAILABLE (40)' }
+          ]
+        },
+        {
+          id: 40,
+          trainNumber: '20634',
+          trainName: 'Thiruvananthapuram Vande Bharat Express',
+          trainType: 'VANDE_BHARAT',
+          fromStationCode: 'CLT',
+          fromStationName: 'Kozhikode (CLT)',
+          toStationCode: 'TVC',
+          toStationName: 'Thiruvananthapuram (TVC)',
+          departureTime: '14:30',
+          arrivalTime: '20:35',
+          durationHours: 6.08,
+          distanceKm: 398.0,
+          runningDays: 'MON,TUE,WED,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 158, stationCode: 'CLT', stationName: 'Kozhikode (CLT)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '14:30', arrivalTime: null },
+            { id: 159, stationCode: 'ERN', stationName: 'Ernakulam Town (ERN)', stopSequence: 2, distanceFromSourceKm: 192, departureTime: '17:18', arrivalTime: '17:15' },
+            { id: 160, stationCode: 'TVC', stationName: 'Thiruvananthapuram Central (TVC)', stopSequence: 3, distanceFromSourceKm: 398, departureTime: null, arrivalTime: '20:35' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 105, fare: 950.00, status: 'AVAILABLE (105)' },
+            { coachType: 'EC', availableSeats: 38, fare: 1780.00, status: 'AVAILABLE (38)' }
+          ]
+        },
+        {
+          id: 41,
+          trainNumber: '12986',
+          trainName: 'Jaipur Double Decker Express',
+          trainType: 'DOUBLE_DECKER',
+          fromStationCode: 'JP',
+          fromStationName: 'Jaipur Junction (JP)',
+          toStationCode: 'NDLS',
+          toStationName: 'New Delhi (NDLS)',
+          departureTime: '06:00',
+          arrivalTime: '10:30',
+          durationHours: 4.5,
+          distanceKm: 303.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 161, stationCode: 'JP', stationName: 'Jaipur Junction (JP)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '06:00', arrivalTime: null },
+            { id: 162, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 2, distanceFromSourceKm: 303, departureTime: null, arrivalTime: '10:30' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 140, fare: 495.00, status: 'AVAILABLE (140)' }
+          ]
+        },
+        {
+          id: 42,
+          trainNumber: '12985',
+          trainName: 'Jaipur Double Decker Express',
+          trainType: 'DOUBLE_DECKER',
+          fromStationCode: 'NDLS',
+          fromStationName: 'New Delhi (NDLS)',
+          toStationCode: 'JP',
+          toStationName: 'Jaipur Junction (JP)',
+          departureTime: '17:35',
+          arrivalTime: '22:05',
+          durationHours: 4.5,
+          distanceKm: 303.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 163, stationCode: 'NDLS', stationName: 'New Delhi (NDLS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '17:35', arrivalTime: null },
+            { id: 164, stationCode: 'JP', stationName: 'Jaipur Junction (JP)', stopSequence: 2, distanceFromSourceKm: 303, departureTime: null, arrivalTime: '22:05' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 135, fare: 495.00, status: 'AVAILABLE (135)' }
+          ]
+        }
       ],
       bookings: [
         {
@@ -772,72 +1326,103 @@
       return { success: true, message: `Station #${id} removed successfully.` };
     },
 
-    searchTrains(from, to, date) {
+        searchTrains(from, to, date) {
       const db = loadDB();
-      const normFrom = normalizeStation(from);
-      const normTo = normalizeStation(to);
+      const fromClusters = getClusterCodes(from);
+      const toClusters = getClusterCodes(to);
 
       let matchedTrains = [];
 
-      if (!normFrom && !normTo) {
-        matchedTrains = db.trains;
+      if (fromClusters.length === 0 && toClusters.length === 0) {
+        matchedTrains = db.trains.map(t => ({
+          ...t,
+          trainId: t.trainId || t.id,
+          id: t.id || t.trainId
+        }));
       } else {
         matchedTrains = db.trains.filter(t => {
-          const hasFrom = !normFrom || (t.routes && t.routes.some(r =>
-            r.stationCode.toUpperCase() === normFrom ||
-            normalizeStation(r.stationCode) === normFrom ||
-            r.stationName.toUpperCase().includes(normFrom)
-          )) || t.fromStationCode.toUpperCase() === normFrom || normalizeStation(t.fromStationName) === normFrom;
+          const hasFrom = fromClusters.length === 0 || fromClusters.some(fc =>
+            (t.routes && t.routes.some(r => r.stationCode.toUpperCase() === fc || normalizeStation(r.stationCode) === fc || r.stationName.toUpperCase().includes(fc))) ||
+            t.fromStationCode.toUpperCase() === fc ||
+            normalizeStation(t.fromStationName) === fc
+          );
 
-          const hasTo = !normTo || (t.routes && t.routes.some(r =>
-            r.stationCode.toUpperCase() === normTo ||
-            normalizeStation(r.stationCode) === normTo ||
-            r.stationName.toUpperCase().includes(normTo)
-          )) || t.toStationCode.toUpperCase() === normTo || normalizeStation(t.toStationName) === normTo;
+          const hasTo = toClusters.length === 0 || toClusters.some(tc =>
+            (t.routes && t.routes.some(r => r.stationCode.toUpperCase() === tc || normalizeStation(r.stationCode) === tc || r.stationName.toUpperCase().includes(tc))) ||
+            t.toStationCode.toUpperCase() === tc ||
+            normalizeStation(t.toStationName) === tc
+          );
 
           if (!hasFrom || !hasTo) return false;
 
-          if (normFrom && normTo && t.routes && t.routes.length > 1) {
-            const fromIdx = t.routes.findIndex(r =>
-              r.stationCode.toUpperCase() === normFrom ||
-              normalizeStation(r.stationCode) === normFrom ||
-              r.stationName.toUpperCase().includes(normFrom)
-            );
-            const toIdx = t.routes.findIndex(r =>
-              r.stationCode.toUpperCase() === normTo ||
-              normalizeStation(r.stationCode) === normTo ||
-              r.stationName.toUpperCase().includes(normTo)
-            );
-            if (fromIdx >= 0 && toIdx >= 0) {
-              return fromIdx < toIdx;
+          if (fromClusters.length > 0 && toClusters.length > 0 && t.routes && t.routes.length > 1) {
+            let earliestFromIdx = 999;
+            let latestToIdx = -1;
+
+            fromClusters.forEach(fc => {
+              const idx = t.routes.findIndex(r => r.stationCode.toUpperCase() === fc || normalizeStation(r.stationCode) === fc || r.stationName.toUpperCase().includes(fc));
+              if (idx !== -1 && idx < earliestFromIdx) earliestFromIdx = idx;
+            });
+
+            toClusters.forEach(tc => {
+              const idx = t.routes.findIndex(r => r.stationCode.toUpperCase() === tc || normalizeStation(r.stationCode) === tc || r.stationName.toUpperCase().includes(tc));
+              if (idx !== -1 && idx > latestToIdx) latestToIdx = idx;
+            });
+
+            if (earliestFromIdx !== 999 && latestToIdx !== -1) {
+              return earliestFromIdx < latestToIdx;
             }
           }
           return true;
+        }).map(t => {
+          let depTime = t.departureTime;
+          let arrTime = t.arrivalTime;
+          let fromName = t.fromStationName;
+          let toName = t.toStationName;
+          let dist = t.distanceKm;
+
+          if (t.routes && t.routes.length > 0) {
+            for (const fc of fromClusters) {
+              const r = t.routes.find(route => route.stationCode.toUpperCase() === fc || normalizeStation(route.stationCode) === fc || route.stationName.toUpperCase().includes(fc));
+              if (r) {
+                if (r.departureTime) depTime = r.departureTime;
+                fromName = r.stationName;
+                break;
+              }
+            }
+            for (const tc of toClusters) {
+              const r = t.routes.find(route => route.stationCode.toUpperCase() === tc || normalizeStation(route.stationCode) === tc || route.stationName.toUpperCase().includes(tc));
+              if (r) {
+                if (r.arrivalTime) arrTime = r.arrivalTime;
+                toName = r.stationName;
+                break;
+              }
+            }
+          }
+
+          return {
+            ...t,
+            trainId: t.trainId || t.id,
+            id: t.id || t.trainId,
+            departureTime: depTime,
+            arrivalTime: arrTime,
+            fromStationName: fromName,
+            toStationName: toName,
+            distanceKm: dist
+          };
         });
       }
 
-      // If no exact trains matched the custom pair, return all operational trains so results are never empty!
+      // If specific search pair has 0 trains, fallback to all fleet trains
       if (!matchedTrains || matchedTrains.length === 0) {
-        matchedTrains = db.trains;
+        matchedTrains = db.trains.map(t => ({
+          ...t,
+          trainId: t.trainId || t.id,
+          id: t.id || t.trainId
+        }));
       }
 
-      return matchedTrains.map(t => ({
-        ...t,
-        trainId: t.trainId || t.id,
-        id: t.id || t.trainId
-      }));
-    },
-
-    lockSeat(seatId, durationMinutes = 10) {
-      const db = loadDB();
-      db.lockedSeats[seatId] = Date.now() + (durationMinutes * 60 * 1000);
-      saveDB(db);
-      return {
-        success: true,
-        seatId: seatId,
-        lockExpiresAt: new Date(db.lockedSeats[seatId]).toISOString(),
-        durationSeconds: durationMinutes * 60
-      };
+      return matchedTrains;
     },
 
     unlockSeat(seatId) {
