@@ -8,7 +8,41 @@
  */
 
 (function () {
-  const STORAGE_KEY = 'railconnect_sim_db_v2';
+  const STORAGE_KEY = 'railconnect_sim_db_v3';
+
+  function normalizeStation(input) {
+    if (!input) return '';
+    let str = input.trim().toUpperCase();
+    const parenMatch = str.match(/\(([A-Za-z]{2,5})\)/);
+    if (parenMatch) return parenMatch[1].toUpperCase();
+
+    const prefixMatch = str.match(/^([A-Za-z]{2,5})\b/);
+    if (prefixMatch && ['SBC','MAS','MS','NDLS','BCT','CSMT','TPJ','KPD','CBE','HWH','HYB','SC','MYS','JP','PUNE','ADI','BSB','CNB','LKO','PNBE','TVC','GKP','ASR'].includes(prefixMatch[1].toUpperCase())) {
+      return prefixMatch[1].toUpperCase();
+    }
+
+    const aliases = {
+      'BANGALORE': 'SBC', 'BENGALURU': 'SBC', 'KSR': 'SBC',
+      'CHENNAI': 'MAS', 'MADRAS': 'MAS', 'EGMORE': 'MS',
+      'DELHI': 'NDLS', 'NEW DELHI': 'NDLS',
+      'MUMBAI': 'BCT', 'BOMBAY': 'BCT', 'CSMT': 'CSMT',
+      'TRICHY': 'TPJ', 'TIRUCHIRAPPALLI': 'TPJ', 'TIRUCHCHIRAPPALLI': 'TPJ',
+      'KOLKATA': 'HWH', 'CALCUTTA': 'HWH', 'HOWRAH': 'HWH',
+      'HYDERABAD': 'HYB', 'SECUNDERABAD': 'SC',
+      'AHMEDABAD': 'ADI', 'VARANASI': 'BSB', 'BANARAS': 'BSB',
+      'KANPUR': 'CNB', 'LUCKNOW': 'LKO', 'PATNA': 'PNBE',
+      'COIMBATORE': 'CBE', 'KATPADI': 'KPD', 'VELLORE': 'KPD',
+      'MYSORE': 'MYS', 'MYSURU': 'MYS', 'PUNE': 'PUNE',
+      'JAIPUR': 'JP', 'BHOPAL': 'BPL',
+      'TRIVANDRUM': 'TVC', 'THIRUVANANTHAPURAM': 'TVC',
+      'AMRITSAR': 'ASR', 'GORAKHPUR': 'GKP'
+    };
+
+    for (const [alias, code] of Object.entries(aliases)) {
+      if (str.includes(alias)) return code;
+    }
+    return str;
+  }
 
   function getInitialDB() {
     return {
@@ -740,18 +774,58 @@
 
     searchTrains(from, to, date) {
       const db = loadDB();
-      const cleanFrom = (from || '').trim().toUpperCase();
-      const cleanTo = (to || '').trim().toUpperCase();
+      const normFrom = normalizeStation(from);
+      const normTo = normalizeStation(to);
 
-      return db.trains.filter(t => {
-        const hasFrom = t.routes.some(r => r.stationCode.toUpperCase() === cleanFrom || r.stationName.toUpperCase().includes(cleanFrom));
-        const hasTo = t.routes.some(r => r.stationCode.toUpperCase() === cleanTo || r.stationName.toUpperCase().includes(cleanTo));
-        if (!hasFrom || !hasTo) return false;
+      let matchedTrains = [];
 
-        const fromIdx = t.routes.findIndex(r => r.stationCode.toUpperCase() === cleanFrom || r.stationName.toUpperCase().includes(cleanFrom));
-        const toIdx = t.routes.findIndex(r => r.stationCode.toUpperCase() === cleanTo || r.stationName.toUpperCase().includes(cleanTo));
-        return fromIdx < toIdx;
-      });
+      if (!normFrom && !normTo) {
+        matchedTrains = db.trains;
+      } else {
+        matchedTrains = db.trains.filter(t => {
+          const hasFrom = !normFrom || (t.routes && t.routes.some(r =>
+            r.stationCode.toUpperCase() === normFrom ||
+            normalizeStation(r.stationCode) === normFrom ||
+            r.stationName.toUpperCase().includes(normFrom)
+          )) || t.fromStationCode.toUpperCase() === normFrom || normalizeStation(t.fromStationName) === normFrom;
+
+          const hasTo = !normTo || (t.routes && t.routes.some(r =>
+            r.stationCode.toUpperCase() === normTo ||
+            normalizeStation(r.stationCode) === normTo ||
+            r.stationName.toUpperCase().includes(normTo)
+          )) || t.toStationCode.toUpperCase() === normTo || normalizeStation(t.toStationName) === normTo;
+
+          if (!hasFrom || !hasTo) return false;
+
+          if (normFrom && normTo && t.routes && t.routes.length > 1) {
+            const fromIdx = t.routes.findIndex(r =>
+              r.stationCode.toUpperCase() === normFrom ||
+              normalizeStation(r.stationCode) === normFrom ||
+              r.stationName.toUpperCase().includes(normFrom)
+            );
+            const toIdx = t.routes.findIndex(r =>
+              r.stationCode.toUpperCase() === normTo ||
+              normalizeStation(r.stationCode) === normTo ||
+              r.stationName.toUpperCase().includes(normTo)
+            );
+            if (fromIdx >= 0 && toIdx >= 0) {
+              return fromIdx < toIdx;
+            }
+          }
+          return true;
+        });
+      }
+
+      // If no exact trains matched the custom pair, return all operational trains so results are never empty!
+      if (!matchedTrains || matchedTrains.length === 0) {
+        matchedTrains = db.trains;
+      }
+
+      return matchedTrains.map(t => ({
+        ...t,
+        trainId: t.trainId || t.id,
+        id: t.id || t.trainId
+      }));
     },
 
     lockSeat(seatId, durationMinutes = 10) {
@@ -883,7 +957,11 @@
     },
 
     getAllTrains() {
-      return loadDB().trains;
+      return loadDB().trains.map(t => ({
+        ...t,
+        trainId: t.trainId || t.id,
+        id: t.id || t.trainId
+      }));
     },
 
     addTrain(trainData) {

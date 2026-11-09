@@ -61,11 +61,11 @@
           <div class="form-row">
             <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">From Station</label>
-              <input type="text" id="heroFrom" class="form-control" placeholder="e.g. SBC (Bengaluru) or TPJ" value="SBC" required>
+              <input type="text" id="heroFrom" list="stationList" class="form-control" placeholder="Station Code or City (e.g. SBC, TPJ, NDLS)" value="SBC" required>
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">To Station</label>
-              <input type="text" id="heroTo" class="form-control" placeholder="e.g. MAS (Chennai Central) or BCT" value="MAS" required>
+              <input type="text" id="heroTo" list="stationList" class="form-control" placeholder="Station Code or City (e.g. MAS, MS, BCT)" value="MAS" required>
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label class="form-label" data-i18n="hero.date">Journey Date</label>
@@ -88,6 +88,28 @@
               </button>
             </div>
           </div>
+
+          <!-- Autocomplete Datalist for Station Codes and Cities -->
+          <datalist id="stationList">
+            <option value="SBC">KSR Bengaluru City (SBC)</option>
+            <option value="MAS">Chennai Central (MAS)</option>
+            <option value="MS">Chennai Egmore (MS)</option>
+            <option value="TPJ">Tiruchchirappalli / Trichy (TPJ)</option>
+            <option value="NDLS">New Delhi (NDLS)</option>
+            <option value="BCT">Mumbai Central (BCT)</option>
+            <option value="CSMT">Chhatrapati Shivaji Terminus (CSMT)</option>
+            <option value="HWH">Howrah Junction / Kolkata (HWH)</option>
+            <option value="HYB">Hyderabad Deccan (HYB)</option>
+            <option value="SC">Secunderabad Junction (SC)</option>
+            <option value="KPD">Katpadi Junction (KPD)</option>
+            <option value="CBE">Coimbatore Junction (CBE)</option>
+            <option value="MYS">Mysuru Junction (MYS)</option>
+            <option value="PUNE">Pune Junction (PUNE)</option>
+            <option value="JP">Jaipur Junction (JP)</option>
+            <option value="ADI">Ahmedabad Junction (ADI)</option>
+            <option value="BSB">Varanasi Junction (BSB)</option>
+            <option value="TVC">Thiruvananthapuram Central (TVC)</option>
+          </datalist>
         </form>
       </div>
 
