@@ -106,7 +106,22 @@ public class DataLoader implements CommandLineRunner {
         Station bpl = stationRepository.save(new Station("BPL", "Bhopal Junction", "Bhopal", "Madhya Pradesh", "WCR", 6));
         Station tvc = stationRepository.save(new Station("TVC", "Thiruvananthapuram Central", "Thiruvananthapuram", "Kerala", "SR", 5));
         Station gkp = stationRepository.save(new Station("GKP", "Gorakhpur Junction", "Gorakhpur", "Uttar Pradesh", "NER", 10));
-        Station asr = stationRepository.save(new Station("ASR", "Amritsar Junction", "Amritsar", "Punjab", "NR", 7));
+                Station asr = stationRepository.save(new Station("ASR", "Amritsar Junction", "Amritsar", "Punjab", "NR", 7));
+        Station tbm = stationRepository.save(new Station("TBM", "Tambaram", "Chennai", "Tamil Nadu", "SR", 8));
+        Station vskp = stationRepository.save(new Station("VSKP", "Visakhapatnam Junction", "Visakhapatnam", "Andhra Pradesh", "ECoR", 8));
+        Station bza = stationRepository.save(new Station("BZA", "Vijayawada Junction", "Vijayawada", "Andhra Pradesh", "SCR", 10));
+        Station gdr = stationRepository.save(new Station("GDR", "Gudur Junction", "Gudur", "Andhra Pradesh", "SCR", 3));
+        Station tpty = stationRepository.save(new Station("TPTY", "Tirupati", "Tirupati", "Andhra Pradesh", "SCR", 6));
+        Station kcg = stationRepository.save(new Station("KCG", "Kacheguda", "Hyderabad", "Telangana", "SCR", 5));
+        Station cto = stationRepository.save(new Station("CTO", "Chittoor", "Chittoor", "Andhra Pradesh", "SCR", 3));
+        Station gnt = stationRepository.save(new Station("GNT", "Guntur Junction", "Guntur", "Andhra Pradesh", "SCR", 7));
+        Station vkb = stationRepository.save(new Station("VKB", "Vikarabad Junction", "Vikarabad", "Telangana", "SCR", 4));
+        Station coa = stationRepository.save(new Station("COA", "Kakinada Port", "Kakinada", "Andhra Pradesh", "SCR", 3));
+        Station lpi = stationRepository.save(new Station("LPI", "Lingampalli", "Hyderabad", "Telangana", "SCR", 6));
+        Station nzb = stationRepository.save(new Station("NZB", "Nizamabad Junction", "Nizamabad", "Telangana", "SCR", 4));
+        Station bbs = stationRepository.save(new Station("BBS", "Bhubaneswar", "Bhubaneswar", "Odisha", "ECoR", 6));
+        Station krnt = stationRepository.save(new Station("KRNT", "Kurnool City", "Kurnool", "Andhra Pradesh", "SCR", 4));
+        Station nzm = stationRepository.save(new Station("NZM", "Hazrat Nizamuddin", "Delhi", "Delhi", "NR", 8));
 
         // 3. Fare Rules
         fareRuleRepository.save(new FareRule("EXPRESS", "SL", 0.45, 20.0, 30.0, 0.0));
@@ -362,6 +377,241 @@ public class DataLoader implements CommandLineRunner {
                         new StopDef(pune, 192.0, LocalTime.of(23, 10), LocalTime.of(23, 15)),
                         new StopDef(bpl, 1025.0, LocalTime.of(12, 10), LocalTime.of(12, 15)),
                         new StopDef(ndls, 1540.0, LocalTime.of(21, 30), null)
+                ));
+
+        
+        // --- 18 SCR & EXPRESS FLEET EXPANSIONS ---
+        // 1. Hussainsagar Express (12702 / 12701)
+        registerTrainWithStops("12702", "Hussainsagar Express", "EXPRESS",
+                LocalTime.of(14, 50), LocalTime.of(4, 55), 14.08, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(hyb, 0.0, null, LocalTime.of(14, 50)),
+                        new StopDef(vkb, 72.0, LocalTime.of(15, 53), LocalTime.of(15, 55)),
+                        new StopDef(pune, 600.0, LocalTime.of(1, 20), LocalTime.of(1, 25)),
+                        new StopDef(csmt, 792.0, LocalTime.of(4, 55), null)
+                ));
+
+        registerTrainWithStops("12701", "Hussainsagar Express", "EXPRESS",
+                LocalTime.of(21, 50), LocalTime.of(12, 5), 14.25, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(csmt, 0.0, null, LocalTime.of(21, 50)),
+                        new StopDef(pune, 192.0, LocalTime.of(1, 20), LocalTime.of(1, 25)),
+                        new StopDef(vkb, 720.0, LocalTime.of(10, 43), LocalTime.of(10, 45)),
+                        new StopDef(hyb, 792.0, LocalTime.of(12, 5), null)
+                ));
+
+        // 2. Charminar Express (12760 / 12759)
+        registerTrainWithStops("12760", "Charminar Express", "SUPERFAST",
+                LocalTime.of(18, 0), LocalTime.of(8, 0), 14.0, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(hyb, 0.0, null, LocalTime.of(18, 0)),
+                        new StopDef(sc, 9.0, LocalTime.of(18, 20), LocalTime.of(18, 25)),
+                        new StopDef(bza, 350.0, LocalTime.of(23, 45), LocalTime.of(23, 55)),
+                        new StopDef(gdr, 640.0, LocalTime.of(4, 18), LocalTime.of(4, 20)),
+                        new StopDef(ms, 772.0, LocalTime.of(7, 15), LocalTime.of(7, 20)),
+                        new StopDef(tbm, 797.0, LocalTime.of(8, 0), null)
+                ));
+
+        registerTrainWithStops("12759", "Charminar Express", "SUPERFAST",
+                LocalTime.of(17, 30), LocalTime.of(7, 45), 14.25, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(tbm, 0.0, null, LocalTime.of(17, 30)),
+                        new StopDef(ms, 25.0, LocalTime.of(18, 0), LocalTime.of(18, 5)),
+                        new StopDef(gdr, 157.0, LocalTime.of(20, 48), LocalTime.of(20, 50)),
+                        new StopDef(bza, 447.0, LocalTime.of(1, 10), LocalTime.of(1, 20)),
+                        new StopDef(sc, 788.0, LocalTime.of(6, 35), LocalTime.of(6, 40)),
+                        new StopDef(hyb, 797.0, LocalTime.of(7, 45), null)
+                ));
+
+        // 3. Godavari Express (12728 / 12727)
+        registerTrainWithStops("12728", "Godavari Express", "SUPERFAST",
+                LocalTime.of(17, 5), LocalTime.of(5, 45), 12.67, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(hyb, 0.0, null, LocalTime.of(17, 5)),
+                        new StopDef(sc, 9.0, LocalTime.of(17, 25), LocalTime.of(17, 30)),
+                        new StopDef(bza, 350.0, LocalTime.of(23, 5), LocalTime.of(23, 15)),
+                        new StopDef(vskp, 706.0, LocalTime.of(5, 45), null)
+                ));
+
+        registerTrainWithStops("12727", "Godavari Express", "SUPERFAST",
+                LocalTime.of(17, 20), LocalTime.of(6, 15), 12.92, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(vskp, 0.0, null, LocalTime.of(17, 20)),
+                        new StopDef(bza, 356.0, LocalTime.of(23, 35), LocalTime.of(23, 45)),
+                        new StopDef(sc, 697.0, LocalTime.of(5, 10), LocalTime.of(5, 15)),
+                        new StopDef(hyb, 706.0, LocalTime.of(6, 15), null)
+                ));
+
+        // 4. Satavahana Express (12714 / 12713)
+        registerTrainWithStops("12714", "Satavahana Express", "SUPERFAST",
+                LocalTime.of(16, 25), LocalTime.of(22, 15), 5.83, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(sc, 0.0, null, LocalTime.of(16, 25)),
+                        new StopDef(bza, 349.0, LocalTime.of(22, 15), null)
+                ));
+
+        registerTrainWithStops("12713", "Satavahana Express", "SUPERFAST",
+                LocalTime.of(6, 25), LocalTime.of(12, 15), 5.83, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(bza, 0.0, null, LocalTime.of(6, 25)),
+                        new StopDef(sc, 349.0, LocalTime.of(12, 15), null)
+                ));
+
+        // 5. Falaknuma Express (12704 / 12703)
+        registerTrainWithStops("12704", "Falaknuma Express", "SUPERFAST",
+                LocalTime.of(15, 55), LocalTime.of(17, 40), 25.75, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(sc, 0.0, null, LocalTime.of(15, 55)),
+                        new StopDef(bza, 349.0, LocalTime.of(21, 20), LocalTime.of(21, 30)),
+                        new StopDef(vskp, 699.0, LocalTime.of(3, 20), LocalTime.of(3, 40)),
+                        new StopDef(bbs, 1141.0, LocalTime.of(9, 50), LocalTime.of(9, 55)),
+                        new StopDef(hwh, 1545.0, LocalTime.of(17, 40), null)
+                ));
+
+        registerTrainWithStops("12703", "Falaknuma Express", "SUPERFAST",
+                LocalTime.of(8, 35), LocalTime.of(9, 35), 25.0, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(hwh, 0.0, null, LocalTime.of(8, 35)),
+                        new StopDef(bbs, 404.0, LocalTime.of(15, 0), LocalTime.of(15, 5)),
+                        new StopDef(vskp, 846.0, LocalTime.of(21, 15), LocalTime.of(21, 35)),
+                        new StopDef(bza, 1196.0, LocalTime.of(4, 0), LocalTime.of(4, 10)),
+                        new StopDef(sc, 1545.0, LocalTime.of(9, 35), null)
+                ));
+
+        // 6. Simhapuri Express (12710 / 12709)
+        registerTrainWithStops("12710", "Simhapuri Express", "SUPERFAST",
+                LocalTime.of(22, 5), LocalTime.of(8, 20), 10.25, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(sc, 0.0, null, LocalTime.of(22, 5)),
+                        new StopDef(bza, 349.0, LocalTime.of(4, 15), LocalTime.of(4, 25)),
+                        new StopDef(gdr, 644.0, LocalTime.of(8, 20), null)
+                ));
+
+        registerTrainWithStops("12709", "Simhapuri Express", "SUPERFAST",
+                LocalTime.of(18, 40), LocalTime.of(5, 40), 11.0, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(gdr, 0.0, null, LocalTime.of(18, 40)),
+                        new StopDef(bza, 295.0, LocalTime.of(23, 15), LocalTime.of(23, 25)),
+                        new StopDef(sc, 644.0, LocalTime.of(5, 40), null)
+                ));
+
+        // 8. Narayanadri Express (12734 / 12733)
+        registerTrainWithStops("12734", "Narayanadri Express", "SUPERFAST",
+                LocalTime.of(18, 5), LocalTime.of(6, 55), 12.83, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(sc, 0.0, null, LocalTime.of(18, 5)),
+                        new StopDef(bza, 349.0, LocalTime.of(23, 40), LocalTime.of(23, 50)),
+                        new StopDef(gdr, 618.0, LocalTime.of(4, 15), LocalTime.of(4, 18)),
+                        new StopDef(tpty, 712.0, LocalTime.of(6, 55), null)
+                ));
+
+        registerTrainWithStops("12733", "Narayanadri Express", "SUPERFAST",
+                LocalTime.of(18, 20), LocalTime.of(6, 55), 12.58, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(tpty, 0.0, null, LocalTime.of(18, 20)),
+                        new StopDef(gdr, 94.0, LocalTime.of(19, 58), LocalTime.of(20, 0)),
+                        new StopDef(bza, 363.0, LocalTime.of(0, 30), LocalTime.of(0, 40)),
+                        new StopDef(sc, 712.0, LocalTime.of(6, 55), null)
+                ));
+
+        // 9. Padmavati Express (12764 / 12763)
+        registerTrainWithStops("12764", "Padmavati Express", "SUPERFAST",
+                LocalTime.of(18, 40), LocalTime.of(7, 15), 12.58, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(sc, 0.0, null, LocalTime.of(18, 40)),
+                        new StopDef(bza, 349.0, LocalTime.of(0, 15), LocalTime.of(0, 25)),
+                        new StopDef(gdr, 618.0, LocalTime.of(4, 45), LocalTime.of(4, 48)),
+                        new StopDef(tpty, 714.0, LocalTime.of(7, 15), null)
+                ));
+
+        // 10. Seven Hills Express (12770 / 12769)
+        registerTrainWithStops("12770", "Seven Hills Express", "SUPERFAST",
+                LocalTime.of(17, 40), LocalTime.of(6, 30), 12.83, "TUE,FRI",
+                List.of(
+                        new StopDef(sc, 0.0, null, LocalTime.of(17, 40)),
+                        new StopDef(krnt, 244.0, LocalTime.of(21, 50), LocalTime.of(21, 55)),
+                        new StopDef(tpty, 712.0, LocalTime.of(6, 30), null)
+                ));
+
+        // 11. Venkatadri Express (12797 / 12798)
+        registerTrainWithStops("12797", "Venkatadri Express", "SUPERFAST",
+                LocalTime.of(20, 5), LocalTime.of(8, 55), 12.83, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(kcg, 0.0, null, LocalTime.of(20, 5)),
+                        new StopDef(krnt, 236.0, LocalTime.of(0, 10), LocalTime.of(0, 15)),
+                        new StopDef(tpty, 625.0, LocalTime.of(7, 10), LocalTime.of(7, 15)),
+                        new StopDef(cto, 698.0, LocalTime.of(8, 55), null)
+                ));
+
+        // 12. Palnadu Express (12748 / 12747)
+        registerTrainWithStops("12748", "Palnadu Express", "SUPERFAST",
+                LocalTime.of(5, 45), LocalTime.of(11, 45), 6.0, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(gnt, 0.0, null, LocalTime.of(5, 45)),
+                        new StopDef(sc, 282.0, LocalTime.of(10, 15), LocalTime.of(10, 20)),
+                        new StopDef(lpi, 305.0, LocalTime.of(10, 50), LocalTime.of(10, 52)),
+                        new StopDef(vkb, 350.0, LocalTime.of(11, 45), null)
+                ));
+
+        // 13. Gowthami Express (12738 / 12737)
+        registerTrainWithStops("12738", "Gowthami Express", "SUPERFAST",
+                LocalTime.of(19, 10), LocalTime.of(7, 40), 12.5, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(coa, 0.0, null, LocalTime.of(19, 10)),
+                        new StopDef(bza, 225.0, LocalTime.of(23, 20), LocalTime.of(23, 30)),
+                        new StopDef(sc, 538.0, LocalTime.of(6, 5), LocalTime.of(6, 15)),
+                        new StopDef(lpi, 588.0, LocalTime.of(7, 40), null)
+                ));
+
+        // 14. Rayalaseema Express (12794 / 12793)
+        registerTrainWithStops("12794", "Rayalaseema Express", "SUPERFAST",
+                LocalTime.of(14, 10), LocalTime.of(6, 15), 16.08, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(nzb, 0.0, null, LocalTime.of(14, 10)),
+                        new StopDef(sc, 161.0, LocalTime.of(17, 20), LocalTime.of(17, 25)),
+                        new StopDef(krnt, 405.0, LocalTime.of(21, 55), LocalTime.of(22, 0)),
+                        new StopDef(tpty, 825.0, LocalTime.of(6, 15), null)
+                ));
+
+        // 15. Visakha Express (17016 / 17015)
+        registerTrainWithStops("17016", "Visakha Express", "EXPRESS",
+                LocalTime.of(16, 50), LocalTime.of(15, 25), 22.58, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(sc, 0.0, null, LocalTime.of(16, 50)),
+                        new StopDef(gnt, 282.0, LocalTime.of(21, 40), LocalTime.of(21, 45)),
+                        new StopDef(bza, 314.0, LocalTime.of(22, 45), LocalTime.of(22, 55)),
+                        new StopDef(vskp, 664.0, LocalTime.of(7, 30), LocalTime.of(7, 50)),
+                        new StopDef(bbs, 1134.0, LocalTime.of(15, 25), null)
+                ));
+
+        // 16. Tungabhadra Express (17023 / 17024)
+        registerTrainWithStops("17023", "Tungabhadra Express", "EXPRESS",
+                LocalTime.of(7, 40), LocalTime.of(12, 30), 4.83, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(sc, 0.0, null, LocalTime.of(7, 40)),
+                        new StopDef(kcg, 12.0, LocalTime.of(8, 0), LocalTime.of(8, 5)),
+                        new StopDef(krnt, 244.0, LocalTime.of(12, 30), null)
+                ));
+
+        // 17. Dakshin Express (12721 / 12722)
+        registerTrainWithStops("12721", "Dakshin Express", "SUPERFAST",
+                LocalTime.of(23, 0), LocalTime.of(4, 0), 29.0, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(hyb, 0.0, null, LocalTime.of(23, 0)),
+                        new StopDef(sc, 9.0, LocalTime.of(23, 25), LocalTime.of(23, 30)),
+                        new StopDef(bpl, 978.0, LocalTime.of(17, 10), LocalTime.of(17, 15)),
+                        new StopDef(nzm, 1670.0, LocalTime.of(4, 0), null)
+                ));
+
+        // 18. Janmabhoomi Express (12806 / 12805)
+        registerTrainWithStops("12806", "Janmabhoomi Express", "SUPERFAST",
+                LocalTime.of(6, 15), LocalTime.of(19, 45), 13.5, "MON,TUE,WED,THU,FRI,SAT,SUN",
+                List.of(
+                        new StopDef(lpi, 0.0, null, LocalTime.of(6, 15)),
+                        new StopDef(sc, 23.0, LocalTime.of(7, 0), LocalTime.of(7, 5)),
+                        new StopDef(gnt, 305.0, LocalTime.of(11, 30), LocalTime.of(11, 35)),
+                        new StopDef(bza, 337.0, LocalTime.of(12, 45), LocalTime.of(12, 55)),
+                        new StopDef(vskp, 720.0, LocalTime.of(19, 45), null)
                 ));
 
         registerTrainWithStops("16589", "Rani Chennamma Express", "EXPRESS",

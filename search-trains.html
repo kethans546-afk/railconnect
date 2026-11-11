@@ -70,6 +70,21 @@
         <option value="HWH">Howrah Junction / Kolkata (HWH)</option>
         <option value="HYB">Hyderabad Deccan (HYB)</option>
         <option value="SC">Secunderabad Junction (SC)</option>
+        <option value="VSKP">Visakhapatnam Junction (VSKP)</option>
+        <option value="BZA">Vijayawada Junction (BZA)</option>
+        <option value="TPTY">Tirupati (TPTY)</option>
+        <option value="KCG">Kacheguda (KCG)</option>
+        <option value="LPI">Lingampalli (LPI)</option>
+        <option value="GNT">Guntur Junction (GNT)</option>
+        <option value="VKB">Vikarabad Junction (VKB)</option>
+        <option value="COA">Kakinada Port (COA)</option>
+        <option value="GDR">Gudur Junction (GDR)</option>
+        <option value="TBM">Tambaram (TBM)</option>
+        <option value="NZB">Nizamabad Junction (NZB)</option>
+        <option value="BBS">Bhubaneswar (BBS)</option>
+        <option value="KRNT">Kurnool City (KRNT)</option>
+        <option value="NZM">Hazrat Nizamuddin (NZM)</option>
+        <option value="CTO">Chittoor (CTO)</option>
         <option value="KPD">Katpadi Junction (KPD)</option>
         <option value="CBE">Coimbatore Junction (CBE)</option>
         <option value="MYS">Mysuru Junction (MYS)</option>
@@ -83,12 +98,13 @@
       <!-- Popular Route Quick-Select Pills -->
       <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
         <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Quick Corridors:</span>
+        <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('HYB', 'VSKP')">🚆 Hyderabad ➔ Vizag (HYB-VSKP)</button>
+        <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('SC', 'BZA')">⚡ Secunderabad ➔ Vijayawada (SC-BZA)</button>
+        <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('SC', 'TPTY')">⭐ Secunderabad ➔ Tirupati (SC-TPTY)</button>
+        <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('HYB', 'CSMT')">👑 Hyderabad ➔ Mumbai (HYB-CSMT)</button>
         <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('SBC', 'MAS')">⚡ Bengaluru ➔ Chennai (SBC-MAS)</button>
         <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('TPJ', 'MAS')">🚆 Trichy ➔ Chennai (TPJ-MAS)</button>
-        <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('NDLS', 'BCT')">👑 Delhi ➔ Mumbai (NDLS-BCT)</button>
-        <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('HWH', 'NDLS')">⭐ Kolkata ➔ Delhi (HWH-NDLS)</button>
-        <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('MAS', 'MYS')">⚡ Chennai ➔ Mysuru (MAS-MYS)</button>
-        <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('', '')">🌐 View All 42 Fleet Trains</button>
+        <button type="button" class="btn btn-secondary btn-sm" style="font-size:0.75rem; padding:4px 10px;" onclick="quickSearch('', '')">🌐 View All 76 Fleet Trains</button>
       </div>
     </div>
 

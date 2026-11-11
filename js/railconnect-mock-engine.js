@@ -8,12 +8,18 @@
  */
 
 (function () {
-  const STORAGE_KEY = 'railconnect_sim_db_v4';
+  const STORAGE_KEY = 'railconnect_sim_db_v5';
 
     const STATION_CLUSTERS = {
     'CHENNAI': ['MAS', 'MS'], 'MADRAS': ['MAS', 'MS'], 'MAS': ['MAS', 'MS'], 'MS': ['MAS', 'MS'],
     'MUMBAI': ['BCT', 'CSMT'], 'BOMBAY': ['BCT', 'CSMT'], 'BCT': ['BCT', 'CSMT'], 'CSMT': ['BCT', 'CSMT'],
-    'HYDERABAD': ['HYB', 'SC'], 'SECUNDERABAD': ['HYB', 'SC'], 'HYB': ['HYB', 'SC'], 'SC': ['HYB', 'SC'],
+    'HYDERABAD': ['HYB', 'SC', 'KCG', 'LPI'], 'SECUNDERABAD': ['HYB', 'SC', 'KCG', 'LPI'], 'KACHEGUDA': ['KCG', 'HYB', 'SC', 'LPI'], 'LINGAMPALLI': ['LPI', 'HYB', 'SC', 'KCG'], 'HYB': ['HYB', 'SC', 'KCG', 'LPI'], 'SC': ['HYB', 'SC', 'KCG', 'LPI'], 'KCG': ['KCG', 'HYB', 'SC', 'LPI'], 'LPI': ['LPI', 'HYB', 'SC', 'KCG'],
+    'TIRUPATI': ['TPTY'], 'TPTY': ['TPTY'], 'VIJAYAWADA': ['BZA'], 'BZA': ['BZA'],
+    'VISAKHAPATNAM': ['VSKP'], 'VIZAG': ['VSKP'], 'VSKP': ['VSKP'], 'GUNTUR': ['GNT'], 'GNT': ['GNT'],
+    'VIKARABAD': ['VKB'], 'VKB': ['VKB'], 'KAKINADA': ['COA'], 'COA': ['COA'], 'GUDUR': ['GDR'], 'GDR': ['GDR'],
+    'CHITTOOR': ['CTO'], 'CTO': ['CTO'], 'NIZAMABAD': ['NZB'], 'NZB': ['NZB'], 'BHUBANESWAR': ['BBS'], 'BBS': ['BBS'],
+    'KURNOOL': ['KRNT'], 'KRNT': ['KRNT'], 'TAMBARAM': ['TBM', 'MAS', 'MS'], 'TBM': ['TBM', 'MAS', 'MS'],
+    'NIZAMUDDIN': ['NZM', 'NDLS'], 'NZM': ['NZM', 'NDLS'],
     'DELHI': ['NDLS'], 'NEW DELHI': ['NDLS'], 'NDLS': ['NDLS'],
     'BENGALURU': ['SBC'], 'BANGALORE': ['SBC'], 'KSR': ['SBC'], 'SBC': ['SBC'],
     'TRICHY': ['TPJ'], 'TIRUCHIRAPPALLI': ['TPJ'], 'TIRUCHCHIRAPPALLI': ['TPJ'], 'TPJ': ['TPJ'],
@@ -90,7 +96,22 @@
         { id: 21, code: 'BPL', name: 'Bhopal Junction', city: 'Bhopal', state: 'Madhya Pradesh', zone: 'WCR', platformCount: 6 },
         { id: 22, code: 'TVC', name: 'Thiruvananthapuram Central', city: 'Thiruvananthapuram', state: 'Kerala', zone: 'SR', platformCount: 5 },
         { id: 23, code: 'GKP', name: 'Gorakhpur Junction', city: 'Gorakhpur', state: 'Uttar Pradesh', zone: 'NER', platformCount: 10 },
-        { id: 24, code: 'ASR', name: 'Amritsar Junction', city: 'Amritsar', state: 'Punjab', zone: 'NR', platformCount: 7 }
+        { id: 24, code: 'ASR', name: 'Amritsar Junction', city: 'Amritsar', state: 'Punjab', zone: 'NR', platformCount: 7 },
+        { id: 25, code: 'TBM', name: 'Tambaram', city: 'Chennai', state: 'Tamil Nadu', zone: 'SR', platformCount: 8 },
+        { id: 26, code: 'VSKP', name: 'Visakhapatnam Junction', city: 'Visakhapatnam', state: 'Andhra Pradesh', zone: 'ECoR', platformCount: 8 },
+        { id: 27, code: 'BZA', name: 'Vijayawada Junction', city: 'Vijayawada', state: 'Andhra Pradesh', zone: 'SCR', platformCount: 10 },
+        { id: 28, code: 'GDR', name: 'Gudur Junction', city: 'Gudur', state: 'Andhra Pradesh', zone: 'SCR', platformCount: 3 },
+        { id: 29, code: 'TPTY', name: 'Tirupati', city: 'Tirupati', state: 'Andhra Pradesh', zone: 'SCR', platformCount: 6 },
+        { id: 30, code: 'KCG', name: 'Kacheguda', city: 'Hyderabad', state: 'Telangana', zone: 'SCR', platformCount: 5 },
+        { id: 31, code: 'CTO', name: 'Chittoor', city: 'Chittoor', state: 'Andhra Pradesh', zone: 'SCR', platformCount: 3 },
+        { id: 32, code: 'GNT', name: 'Guntur Junction', city: 'Guntur', state: 'Andhra Pradesh', zone: 'SCR', platformCount: 7 },
+        { id: 33, code: 'VKB', name: 'Vikarabad Junction', city: 'Vikarabad', state: 'Telangana', zone: 'SCR', platformCount: 4 },
+        { id: 34, code: 'COA', name: 'Kakinada Port', city: 'Kakinada', state: 'Andhra Pradesh', zone: 'SCR', platformCount: 3 },
+        { id: 35, code: 'LPI', name: 'Lingampalli', city: 'Hyderabad', state: 'Telangana', zone: 'SCR', platformCount: 6 },
+        { id: 36, code: 'NZB', name: 'Nizamabad Junction', city: 'Nizamabad', state: 'Telangana', zone: 'SCR', platformCount: 4 },
+        { id: 37, code: 'BBS', name: 'Bhubaneswar', city: 'Bhubaneswar', state: 'Odisha', zone: 'ECoR', platformCount: 6 },
+        { id: 38, code: 'KRNT', name: 'Kurnool City', city: 'Kurnool', state: 'Andhra Pradesh', zone: 'SCR', platformCount: 4 },
+        { id: 39, code: 'NZM', name: 'Hazrat Nizamuddin', city: 'Delhi', state: 'Delhi', zone: 'NR', platformCount: 8 }
       ],
       trains: [
         // --- VANDE BHARAT FLEET ---
@@ -1173,6 +1194,940 @@
           ],
           availableClasses: [
             { coachType: 'CC', availableSeats: 135, fare: 495.00, status: 'AVAILABLE (135)' }
+          ]
+        },
+        {
+          id: 165,
+          trainNumber: '12702',
+          trainName: 'Hussainsagar Express',
+          trainType: 'EXPRESS',
+          fromStationCode: 'HYB',
+          fromStationName: 'Hyderabad Deccan (HYB)',
+          toStationCode: 'CSMT',
+          toStationName: 'Mumbai CSMT',
+          departureTime: '14:50',
+          arrivalTime: '04:55',
+          durationHours: 14.08,
+          distanceKm: 792.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 165, stationCode: 'HYB', stationName: 'Hyderabad Deccan (HYB)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '14:50', arrivalTime: null },
+            { id: 166, stationCode: 'VKB', stationName: 'Vikarabad Junction (VKB)', stopSequence: 2, distanceFromSourceKm: 72, departureTime: '15:55', arrivalTime: '15:53' },
+            { id: 167, stationCode: 'PUNE', stationName: 'Pune Junction (PUNE)', stopSequence: 3, distanceFromSourceKm: 600, departureTime: '01:25', arrivalTime: '01:20' },
+            { id: 168, stationCode: 'CSMT', stationName: 'Mumbai CSMT', stopSequence: 4, distanceFromSourceKm: 792, departureTime: null, arrivalTime: '04:55' }
+          ],
+          availableClasses: [
+            { coachType: '2A', availableSeats: 42, fare: 1820.00, status: 'AVAILABLE (42)' },
+            { coachType: '3A', availableSeats: 78, fare: 1280.00, status: 'AVAILABLE (78)' },
+            { coachType: 'SL', availableSeats: 140, fare: 480.00, status: 'AVAILABLE (140)' }
+          ]
+        },
+        {
+          id: 166,
+          trainNumber: '12701',
+          trainName: 'Hussainsagar Express',
+          trainType: 'EXPRESS',
+          fromStationCode: 'CSMT',
+          fromStationName: 'Mumbai CSMT',
+          toStationCode: 'HYB',
+          toStationName: 'Hyderabad Deccan (HYB)',
+          departureTime: '21:50',
+          arrivalTime: '12:05',
+          durationHours: 14.25,
+          distanceKm: 792.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 169, stationCode: 'CSMT', stationName: 'Mumbai CSMT', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '21:50', arrivalTime: null },
+            { id: 170, stationCode: 'PUNE', stationName: 'Pune Junction (PUNE)', stopSequence: 2, distanceFromSourceKm: 192, departureTime: '01:25', arrivalTime: '01:20' },
+            { id: 171, stationCode: 'VKB', stationName: 'Vikarabad Junction (VKB)', stopSequence: 3, distanceFromSourceKm: 720, departureTime: '10:45', arrivalTime: '10:43' },
+            { id: 172, stationCode: 'HYB', stationName: 'Hyderabad Deccan (HYB)', stopSequence: 4, distanceFromSourceKm: 792, departureTime: null, arrivalTime: '12:05' }
+          ],
+          availableClasses: [
+            { coachType: '2A', availableSeats: 38, fare: 1820.00, status: 'AVAILABLE (38)' },
+            { coachType: '3A', availableSeats: 72, fare: 1280.00, status: 'AVAILABLE (72)' },
+            { coachType: 'SL', availableSeats: 135, fare: 480.00, status: 'AVAILABLE (135)' }
+          ]
+        },
+        {
+          id: 167,
+          trainNumber: '12760',
+          trainName: 'Charminar Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'HYB',
+          fromStationName: 'Hyderabad Deccan (HYB)',
+          toStationCode: 'TBM',
+          toStationName: 'Tambaram (TBM)',
+          departureTime: '18:00',
+          arrivalTime: '08:00',
+          durationHours: 14.0,
+          distanceKm: 797.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 173, stationCode: 'HYB', stationName: 'Hyderabad Deccan (HYB)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '18:00', arrivalTime: null },
+            { id: 174, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 2, distanceFromSourceKm: 9, departureTime: '18:25', arrivalTime: '18:20' },
+            { id: 175, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 3, distanceFromSourceKm: 350, departureTime: '23:55', arrivalTime: '23:45' },
+            { id: 176, stationCode: 'GDR', stationName: 'Gudur Junction (GDR)', stopSequence: 4, distanceFromSourceKm: 640, departureTime: '04:20', arrivalTime: '04:18' },
+            { id: 177, stationCode: 'MS', stationName: 'Chennai Egmore (MS)', stopSequence: 5, distanceFromSourceKm: 772, departureTime: '07:20', arrivalTime: '07:15' },
+            { id: 178, stationCode: 'TBM', stationName: 'Tambaram (TBM)', stopSequence: 6, distanceFromSourceKm: 797, departureTime: null, arrivalTime: '08:00' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 16, fare: 2680.00, status: 'AVAILABLE (16)' },
+            { coachType: '2A', availableSeats: 44, fare: 1840.00, status: 'AVAILABLE (44)' },
+            { coachType: '3A', availableSeats: 80, fare: 1310.00, status: 'AVAILABLE (80)' },
+            { coachType: 'SL', availableSeats: 150, fare: 490.00, status: 'AVAILABLE (150)' }
+          ]
+        },
+        {
+          id: 168,
+          trainNumber: '12759',
+          trainName: 'Charminar Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'TBM',
+          fromStationName: 'Tambaram (TBM)',
+          toStationCode: 'HYB',
+          toStationName: 'Hyderabad Deccan (HYB)',
+          departureTime: '17:30',
+          arrivalTime: '07:45',
+          durationHours: 14.25,
+          distanceKm: 797.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 179, stationCode: 'TBM', stationName: 'Tambaram (TBM)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '17:30', arrivalTime: null },
+            { id: 180, stationCode: 'MS', stationName: 'Chennai Egmore (MS)', stopSequence: 2, distanceFromSourceKm: 25, departureTime: '18:05', arrivalTime: '18:00' },
+            { id: 181, stationCode: 'GDR', stationName: 'Gudur Junction (GDR)', stopSequence: 3, distanceFromSourceKm: 157, departureTime: '20:50', arrivalTime: '20:48' },
+            { id: 182, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 4, distanceFromSourceKm: 447, departureTime: '01:20', arrivalTime: '01:10' },
+            { id: 183, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 5, distanceFromSourceKm: 788, departureTime: '06:40', arrivalTime: '06:35' },
+            { id: 184, stationCode: 'HYB', stationName: 'Hyderabad Deccan (HYB)', stopSequence: 6, distanceFromSourceKm: 797, departureTime: null, arrivalTime: '07:45' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 14, fare: 2680.00, status: 'AVAILABLE (14)' },
+            { coachType: '2A', availableSeats: 40, fare: 1840.00, status: 'AVAILABLE (40)' },
+            { coachType: '3A', availableSeats: 76, fare: 1310.00, status: 'AVAILABLE (76)' },
+            { coachType: 'SL', availableSeats: 145, fare: 490.00, status: 'AVAILABLE (145)' }
+          ]
+        },
+        {
+          id: 169,
+          trainNumber: '12728',
+          trainName: 'Godavari Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'HYB',
+          fromStationName: 'Hyderabad Deccan (HYB)',
+          toStationCode: 'VSKP',
+          toStationName: 'Visakhapatnam (VSKP)',
+          departureTime: '17:05',
+          arrivalTime: '05:45',
+          durationHours: 12.67,
+          distanceKm: 706.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 185, stationCode: 'HYB', stationName: 'Hyderabad Deccan (HYB)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '17:05', arrivalTime: null },
+            { id: 186, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 2, distanceFromSourceKm: 9, departureTime: '17:30', arrivalTime: '17:25' },
+            { id: 187, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 3, distanceFromSourceKm: 350, departureTime: '23:15', arrivalTime: '23:05' },
+            { id: 188, stationCode: 'VSKP', stationName: 'Visakhapatnam (VSKP)', stopSequence: 4, distanceFromSourceKm: 706, departureTime: null, arrivalTime: '05:45' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 18, fare: 2520.00, status: 'AVAILABLE (18)' },
+            { coachType: '2A', availableSeats: 46, fare: 1720.00, status: 'AVAILABLE (46)' },
+            { coachType: '3A', availableSeats: 85, fare: 1230.00, status: 'AVAILABLE (85)' },
+            { coachType: 'SL', availableSeats: 160, fare: 460.00, status: 'AVAILABLE (160)' }
+          ]
+        },
+        {
+          id: 170,
+          trainNumber: '12727',
+          trainName: 'Godavari Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'VSKP',
+          fromStationName: 'Visakhapatnam (VSKP)',
+          toStationCode: 'HYB',
+          toStationName: 'Hyderabad Deccan (HYB)',
+          departureTime: '17:20',
+          arrivalTime: '06:15',
+          durationHours: 12.92,
+          distanceKm: 706.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 189, stationCode: 'VSKP', stationName: 'Visakhapatnam (VSKP)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '17:20', arrivalTime: null },
+            { id: 190, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 2, distanceFromSourceKm: 356, departureTime: '23:45', arrivalTime: '23:35' },
+            { id: 191, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 3, distanceFromSourceKm: 697, departureTime: '05:15', arrivalTime: '05:10' },
+            { id: 192, stationCode: 'HYB', stationName: 'Hyderabad Deccan (HYB)', stopSequence: 4, distanceFromSourceKm: 706, departureTime: null, arrivalTime: '06:15' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 16, fare: 2520.00, status: 'AVAILABLE (16)' },
+            { coachType: '2A', availableSeats: 42, fare: 1720.00, status: 'AVAILABLE (42)' },
+            { coachType: '3A', availableSeats: 80, fare: 1230.00, status: 'AVAILABLE (80)' },
+            { coachType: 'SL', availableSeats: 150, fare: 460.00, status: 'AVAILABLE (150)' }
+          ]
+        },
+        {
+          id: 171,
+          trainNumber: '12714',
+          trainName: 'Satavahana Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'SC',
+          fromStationName: 'Secunderabad (SC)',
+          toStationCode: 'BZA',
+          toStationName: 'Vijayawada (BZA)',
+          departureTime: '16:25',
+          arrivalTime: '22:15',
+          durationHours: 5.83,
+          distanceKm: 349.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 193, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '16:25', arrivalTime: null },
+            { id: 194, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 2, distanceFromSourceKm: 349, departureTime: null, arrivalTime: '22:15' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 110, fare: 530.00, status: 'AVAILABLE (110)' },
+            { coachType: '3A', availableSeats: 64, fare: 740.00, status: 'AVAILABLE (64)' },
+            { coachType: 'SL', availableSeats: 180, fare: 255.00, status: 'AVAILABLE (180)' }
+          ]
+        },
+        {
+          id: 172,
+          trainNumber: '12713',
+          trainName: 'Satavahana Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'BZA',
+          fromStationName: 'Vijayawada (BZA)',
+          toStationCode: 'SC',
+          toStationName: 'Secunderabad (SC)',
+          departureTime: '06:25',
+          arrivalTime: '12:15',
+          durationHours: 5.83,
+          distanceKm: 349.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 195, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '06:25', arrivalTime: null },
+            { id: 196, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 2, distanceFromSourceKm: 349, departureTime: null, arrivalTime: '12:15' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 105, fare: 530.00, status: 'AVAILABLE (105)' },
+            { coachType: '3A', availableSeats: 60, fare: 740.00, status: 'AVAILABLE (60)' },
+            { coachType: 'SL', availableSeats: 175, fare: 255.00, status: 'AVAILABLE (175)' }
+          ]
+        },
+        {
+          id: 173,
+          trainNumber: '12704',
+          trainName: 'Falaknuma Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'SC',
+          fromStationName: 'Secunderabad (SC)',
+          toStationCode: 'HWH',
+          toStationName: 'Howrah (HWH)',
+          departureTime: '15:55',
+          arrivalTime: '17:40',
+          durationHours: 25.75,
+          distanceKm: 1545.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 197, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '15:55', arrivalTime: null },
+            { id: 198, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 2, distanceFromSourceKm: 349, departureTime: '21:30', arrivalTime: '21:20' },
+            { id: 199, stationCode: 'VSKP', stationName: 'Visakhapatnam (VSKP)', stopSequence: 3, distanceFromSourceKm: 699, departureTime: '03:40', arrivalTime: '03:20' },
+            { id: 200, stationCode: 'BBS', stationName: 'Bhubaneswar (BBS)', stopSequence: 4, distanceFromSourceKm: 1141, departureTime: '09:55', arrivalTime: '09:50' },
+            { id: 201, stationCode: 'HWH', stationName: 'Howrah (HWH)', stopSequence: 5, distanceFromSourceKm: 1545, departureTime: null, arrivalTime: '17:40' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 18, fare: 4650.00, status: 'AVAILABLE (18)' },
+            { coachType: '2A', availableSeats: 48, fare: 2840.00, status: 'AVAILABLE (48)' },
+            { coachType: '3A', availableSeats: 92, fare: 2040.00, status: 'AVAILABLE (92)' },
+            { coachType: 'SL', availableSeats: 160, fare: 770.00, status: 'AVAILABLE (160)' }
+          ]
+        },
+        {
+          id: 174,
+          trainNumber: '12703',
+          trainName: 'Falaknuma Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'HWH',
+          fromStationName: 'Howrah (HWH)',
+          toStationCode: 'SC',
+          toStationName: 'Secunderabad (SC)',
+          departureTime: '08:35',
+          arrivalTime: '09:35',
+          durationHours: 25.0,
+          distanceKm: 1545.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 202, stationCode: 'HWH', stationName: 'Howrah (HWH)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '08:35', arrivalTime: null },
+            { id: 203, stationCode: 'BBS', stationName: 'Bhubaneswar (BBS)', stopSequence: 2, distanceFromSourceKm: 404, departureTime: '15:05', arrivalTime: '15:00' },
+            { id: 204, stationCode: 'VSKP', stationName: 'Visakhapatnam (VSKP)', stopSequence: 3, distanceFromSourceKm: 846, departureTime: '21:35', arrivalTime: '21:15' },
+            { id: 205, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 4, distanceFromSourceKm: 1196, departureTime: '04:10', arrivalTime: '04:00' },
+            { id: 206, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 5, distanceFromSourceKm: 1545, departureTime: null, arrivalTime: '09:35' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 16, fare: 4650.00, status: 'AVAILABLE (16)' },
+            { coachType: '2A', availableSeats: 44, fare: 2840.00, status: 'AVAILABLE (44)' },
+            { coachType: '3A', availableSeats: 86, fare: 2040.00, status: 'AVAILABLE (86)' },
+            { coachType: 'SL', availableSeats: 155, fare: 770.00, status: 'AVAILABLE (155)' }
+          ]
+        },
+        {
+          id: 175,
+          trainNumber: '12710',
+          trainName: 'Simhapuri Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'SC',
+          fromStationName: 'Secunderabad (SC)',
+          toStationCode: 'GDR',
+          toStationName: 'Gudur (GDR)',
+          departureTime: '22:05',
+          arrivalTime: '08:20',
+          durationHours: 10.25,
+          distanceKm: 644.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 207, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '22:05', arrivalTime: null },
+            { id: 208, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 2, distanceFromSourceKm: 349, departureTime: '04:25', arrivalTime: '04:15' },
+            { id: 209, stationCode: 'GDR', stationName: 'Gudur (GDR)', stopSequence: 3, distanceFromSourceKm: 644, departureTime: null, arrivalTime: '08:20' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 14, fare: 2420.00, status: 'AVAILABLE (14)' },
+            { coachType: '2A', availableSeats: 40, fare: 1640.00, status: 'AVAILABLE (40)' },
+            { coachType: '3A', availableSeats: 78, fare: 1180.00, status: 'AVAILABLE (78)' },
+            { coachType: 'SL', availableSeats: 145, fare: 440.00, status: 'AVAILABLE (145)' }
+          ]
+        },
+        {
+          id: 176,
+          trainNumber: '12709',
+          trainName: 'Simhapuri Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'GDR',
+          fromStationName: 'Gudur (GDR)',
+          toStationCode: 'SC',
+          toStationName: 'Secunderabad (SC)',
+          departureTime: '18:40',
+          arrivalTime: '05:40',
+          durationHours: 11.0,
+          distanceKm: 644.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 210, stationCode: 'GDR', stationName: 'Gudur (GDR)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '18:40', arrivalTime: null },
+            { id: 211, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 2, distanceFromSourceKm: 295, departureTime: '23:25', arrivalTime: '23:15' },
+            { id: 212, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 3, distanceFromSourceKm: 644, departureTime: null, arrivalTime: '05:40' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 12, fare: 2420.00, status: 'AVAILABLE (12)' },
+            { coachType: '2A', availableSeats: 36, fare: 1640.00, status: 'AVAILABLE (36)' },
+            { coachType: '3A', availableSeats: 74, fare: 1180.00, status: 'AVAILABLE (74)' },
+            { coachType: 'SL', availableSeats: 140, fare: 440.00, status: 'AVAILABLE (140)' }
+          ]
+        },
+        {
+          id: 177,
+          trainNumber: '12734',
+          trainName: 'Narayanadri Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'SC',
+          fromStationName: 'Secunderabad (SC)',
+          toStationCode: 'TPTY',
+          toStationName: 'Tirupati (TPTY)',
+          departureTime: '18:05',
+          arrivalTime: '06:55',
+          durationHours: 12.83,
+          distanceKm: 712.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 213, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '18:05', arrivalTime: null },
+            { id: 214, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 2, distanceFromSourceKm: 349, departureTime: '23:50', arrivalTime: '23:40' },
+            { id: 215, stationCode: 'GDR', stationName: 'Gudur (GDR)', stopSequence: 3, distanceFromSourceKm: 618, departureTime: '04:18', arrivalTime: '04:15' },
+            { id: 216, stationCode: 'TPTY', stationName: 'Tirupati (TPTY)', stopSequence: 4, distanceFromSourceKm: 712, departureTime: null, arrivalTime: '06:55' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 18, fare: 2580.00, status: 'AVAILABLE (18)' },
+            { coachType: '2A', availableSeats: 48, fare: 1750.00, status: 'AVAILABLE (48)' },
+            { coachType: '3A', availableSeats: 88, fare: 1250.00, status: 'AVAILABLE (88)' },
+            { coachType: 'SL', availableSeats: 170, fare: 470.00, status: 'AVAILABLE (170)' }
+          ]
+        },
+        {
+          id: 178,
+          trainNumber: '12733',
+          trainName: 'Narayanadri Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'TPTY',
+          fromStationName: 'Tirupati (TPTY)',
+          toStationCode: 'SC',
+          toStationName: 'Secunderabad (SC)',
+          departureTime: '18:20',
+          arrivalTime: '06:55',
+          durationHours: 12.58,
+          distanceKm: 712.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 217, stationCode: 'TPTY', stationName: 'Tirupati (TPTY)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '18:20', arrivalTime: null },
+            { id: 218, stationCode: 'GDR', stationName: 'Gudur (GDR)', stopSequence: 2, distanceFromSourceKm: 94, departureTime: '20:00', arrivalTime: '19:58' },
+            { id: 219, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 3, distanceFromSourceKm: 363, departureTime: '00:40', arrivalTime: '00:30' },
+            { id: 220, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 4, distanceFromSourceKm: 712, departureTime: null, arrivalTime: '06:55' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 16, fare: 2580.00, status: 'AVAILABLE (16)' },
+            { coachType: '2A', availableSeats: 45, fare: 1750.00, status: 'AVAILABLE (45)' },
+            { coachType: '3A', availableSeats: 84, fare: 1250.00, status: 'AVAILABLE (84)' },
+            { coachType: 'SL', availableSeats: 165, fare: 470.00, status: 'AVAILABLE (165)' }
+          ]
+        },
+        {
+          id: 179,
+          trainNumber: '12764',
+          trainName: 'Padmavati Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'SC',
+          fromStationName: 'Secunderabad (SC)',
+          toStationCode: 'TPTY',
+          toStationName: 'Tirupati (TPTY)',
+          departureTime: '18:40',
+          arrivalTime: '07:15',
+          durationHours: 12.58,
+          distanceKm: 714.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 221, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '18:40', arrivalTime: null },
+            { id: 222, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 2, distanceFromSourceKm: 349, departureTime: '00:25', arrivalTime: '00:15' },
+            { id: 223, stationCode: 'GDR', stationName: 'Gudur (GDR)', stopSequence: 3, distanceFromSourceKm: 618, departureTime: '04:48', arrivalTime: '04:45' },
+            { id: 224, stationCode: 'TPTY', stationName: 'Tirupati (TPTY)', stopSequence: 4, distanceFromSourceKm: 714, departureTime: null, arrivalTime: '07:15' }
+          ],
+          availableClasses: [
+            { coachType: '2A', availableSeats: 44, fare: 1750.00, status: 'AVAILABLE (44)' },
+            { coachType: '3A', availableSeats: 82, fare: 1250.00, status: 'AVAILABLE (82)' },
+            { coachType: 'SL', availableSeats: 160, fare: 470.00, status: 'AVAILABLE (160)' }
+          ]
+        },
+        {
+          id: 180,
+          trainNumber: '12763',
+          trainName: 'Padmavati Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'TPTY',
+          fromStationName: 'Tirupati (TPTY)',
+          toStationCode: 'SC',
+          toStationName: 'Secunderabad (SC)',
+          departureTime: '16:55',
+          arrivalTime: '05:55',
+          durationHours: 13.0,
+          distanceKm: 714.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 225, stationCode: 'TPTY', stationName: 'Tirupati (TPTY)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '16:55', arrivalTime: null },
+            { id: 226, stationCode: 'GDR', stationName: 'Gudur (GDR)', stopSequence: 2, distanceFromSourceKm: 94, departureTime: '18:40', arrivalTime: '18:38' },
+            { id: 227, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 3, distanceFromSourceKm: 365, departureTime: '23:45', arrivalTime: '23:35' },
+            { id: 228, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 4, distanceFromSourceKm: 714, departureTime: null, arrivalTime: '05:55' }
+          ],
+          availableClasses: [
+            { coachType: '2A', availableSeats: 40, fare: 1750.00, status: 'AVAILABLE (40)' },
+            { coachType: '3A', availableSeats: 78, fare: 1250.00, status: 'AVAILABLE (78)' },
+            { coachType: 'SL', availableSeats: 150, fare: 470.00, status: 'AVAILABLE (150)' }
+          ]
+        },
+        {
+          id: 181,
+          trainNumber: '12770',
+          trainName: 'Seven Hills Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'SC',
+          fromStationName: 'Secunderabad (SC)',
+          toStationCode: 'TPTY',
+          toStationName: 'Tirupati (TPTY)',
+          departureTime: '17:40',
+          arrivalTime: '06:30',
+          durationHours: 12.83,
+          distanceKm: 712.0,
+          runningDays: 'TUE,FRI',
+          active: true,
+          routes: [
+            { id: 229, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '17:40', arrivalTime: null },
+            { id: 230, stationCode: 'KRNT', stationName: 'Kurnool City (KRNT)', stopSequence: 2, distanceFromSourceKm: 244, departureTime: '21:55', arrivalTime: '21:50' },
+            { id: 231, stationCode: 'TPTY', stationName: 'Tirupati (TPTY)', stopSequence: 3, distanceFromSourceKm: 712, departureTime: null, arrivalTime: '06:30' }
+          ],
+          availableClasses: [
+            { coachType: '2A', availableSeats: 36, fare: 1750.00, status: 'AVAILABLE (36)' },
+            { coachType: '3A', availableSeats: 72, fare: 1250.00, status: 'AVAILABLE (72)' },
+            { coachType: 'SL', availableSeats: 150, fare: 470.00, status: 'AVAILABLE (150)' }
+          ]
+        },
+        {
+          id: 182,
+          trainNumber: '12769',
+          trainName: 'Seven Hills Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'TPTY',
+          fromStationName: 'Tirupati (TPTY)',
+          toStationCode: 'SC',
+          toStationName: 'Secunderabad (SC)',
+          departureTime: '15:40',
+          arrivalTime: '04:35',
+          durationHours: 12.92,
+          distanceKm: 712.0,
+          runningDays: 'MON,FRI',
+          active: true,
+          routes: [
+            { id: 232, stationCode: 'TPTY', stationName: 'Tirupati (TPTY)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '15:40', arrivalTime: null },
+            { id: 233, stationCode: 'KRNT', stationName: 'Kurnool City (KRNT)', stopSequence: 2, distanceFromSourceKm: 468, departureTime: '00:05', arrivalTime: '00:01' },
+            { id: 234, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 3, distanceFromSourceKm: 712, departureTime: null, arrivalTime: '04:35' }
+          ],
+          availableClasses: [
+            { coachType: '2A', availableSeats: 34, fare: 1750.00, status: 'AVAILABLE (34)' },
+            { coachType: '3A', availableSeats: 68, fare: 1250.00, status: 'AVAILABLE (68)' },
+            { coachType: 'SL', availableSeats: 140, fare: 470.00, status: 'AVAILABLE (140)' }
+          ]
+        },
+        {
+          id: 183,
+          trainNumber: '12797',
+          trainName: 'Venkatadri Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'KCG',
+          fromStationName: 'Kacheguda (KCG)',
+          toStationCode: 'CTO',
+          toStationName: 'Chittoor (CTO)',
+          departureTime: '20:05',
+          arrivalTime: '08:55',
+          durationHours: 12.83,
+          distanceKm: 698.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 235, stationCode: 'KCG', stationName: 'Kacheguda (KCG)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '20:05', arrivalTime: null },
+            { id: 236, stationCode: 'KRNT', stationName: 'Kurnool City (KRNT)', stopSequence: 2, distanceFromSourceKm: 236, departureTime: '00:15', arrivalTime: '00:10' },
+            { id: 237, stationCode: 'TPTY', stationName: 'Tirupati (TPTY)', stopSequence: 3, distanceFromSourceKm: 625, departureTime: '07:15', arrivalTime: '07:10' },
+            { id: 238, stationCode: 'CTO', stationName: 'Chittoor (CTO)', stopSequence: 4, distanceFromSourceKm: 698, departureTime: null, arrivalTime: '08:55' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 16, fare: 2540.00, status: 'AVAILABLE (16)' },
+            { coachType: '2A', availableSeats: 42, fare: 1720.00, status: 'AVAILABLE (42)' },
+            { coachType: '3A', availableSeats: 80, fare: 1230.00, status: 'AVAILABLE (80)' },
+            { coachType: 'SL', availableSeats: 160, fare: 460.00, status: 'AVAILABLE (160)' }
+          ]
+        },
+        {
+          id: 184,
+          trainNumber: '12798',
+          trainName: 'Venkatadri Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'CTO',
+          fromStationName: 'Chittoor (CTO)',
+          toStationCode: 'KCG',
+          toStationName: 'Kacheguda (KCG)',
+          departureTime: '17:35',
+          arrivalTime: '06:20',
+          durationHours: 12.75,
+          distanceKm: 698.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 239, stationCode: 'CTO', stationName: 'Chittoor (CTO)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '17:35', arrivalTime: null },
+            { id: 240, stationCode: 'TPTY', stationName: 'Tirupati (TPTY)', stopSequence: 2, distanceFromSourceKm: 73, departureTime: '18:35', arrivalTime: '18:30' },
+            { id: 241, stationCode: 'KRNT', stationName: 'Kurnool City (KRNT)', stopSequence: 3, distanceFromSourceKm: 462, departureTime: '01:25', arrivalTime: '01:20' },
+            { id: 242, stationCode: 'KCG', stationName: 'Kacheguda (KCG)', stopSequence: 4, distanceFromSourceKm: 698, departureTime: null, arrivalTime: '06:20' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 14, fare: 2540.00, status: 'AVAILABLE (14)' },
+            { coachType: '2A', availableSeats: 38, fare: 1720.00, status: 'AVAILABLE (38)' },
+            { coachType: '3A', availableSeats: 76, fare: 1230.00, status: 'AVAILABLE (76)' },
+            { coachType: 'SL', availableSeats: 150, fare: 460.00, status: 'AVAILABLE (150)' }
+          ]
+        },
+        {
+          id: 185,
+          trainNumber: '12748',
+          trainName: 'Palnadu Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'GNT',
+          fromStationName: 'Guntur (GNT)',
+          toStationCode: 'VKB',
+          toStationName: 'Vikarabad (VKB)',
+          departureTime: '05:45',
+          arrivalTime: '11:45',
+          durationHours: 6.0,
+          distanceKm: 350.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 243, stationCode: 'GNT', stationName: 'Guntur (GNT)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '05:45', arrivalTime: null },
+            { id: 244, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 2, distanceFromSourceKm: 282, departureTime: '10:20', arrivalTime: '10:15' },
+            { id: 245, stationCode: 'LPI', stationName: 'Lingampalli (LPI)', stopSequence: 3, distanceFromSourceKm: 305, departureTime: '10:52', arrivalTime: '10:50' },
+            { id: 246, stationCode: 'VKB', stationName: 'Vikarabad (VKB)', stopSequence: 4, distanceFromSourceKm: 350, departureTime: null, arrivalTime: '11:45' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 120, fare: 520.00, status: 'AVAILABLE (120)' },
+            { coachType: 'SL', availableSeats: 180, fare: 250.00, status: 'AVAILABLE (180)' }
+          ]
+        },
+        {
+          id: 186,
+          trainNumber: '12747',
+          trainName: 'Palnadu Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'VKB',
+          fromStationName: 'Vikarabad (VKB)',
+          toStationCode: 'GNT',
+          toStationName: 'Guntur (GNT)',
+          departureTime: '14:15',
+          arrivalTime: '20:30',
+          durationHours: 6.25,
+          distanceKm: 350.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 247, stationCode: 'VKB', stationName: 'Vikarabad (VKB)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '14:15', arrivalTime: null },
+            { id: 248, stationCode: 'LPI', stationName: 'Lingampalli (LPI)', stopSequence: 2, distanceFromSourceKm: 45, departureTime: '15:02', arrivalTime: '15:00' },
+            { id: 249, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 3, distanceFromSourceKm: 68, departureTime: '15:40', arrivalTime: '15:35' },
+            { id: 250, stationCode: 'GNT', stationName: 'Guntur (GNT)', stopSequence: 4, distanceFromSourceKm: 350, departureTime: null, arrivalTime: '20:30' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 115, fare: 520.00, status: 'AVAILABLE (115)' },
+            { coachType: 'SL', availableSeats: 175, fare: 250.00, status: 'AVAILABLE (175)' }
+          ]
+        },
+        {
+          id: 187,
+          trainNumber: '12738',
+          trainName: 'Gowthami Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'COA',
+          fromStationName: 'Kakinada Port (COA)',
+          toStationCode: 'LPI',
+          toStationName: 'Lingampalli (LPI)',
+          departureTime: '19:10',
+          arrivalTime: '07:40',
+          durationHours: 12.5,
+          distanceKm: 588.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 251, stationCode: 'COA', stationName: 'Kakinada Port (COA)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '19:10', arrivalTime: null },
+            { id: 252, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 2, distanceFromSourceKm: 225, departureTime: '23:30', arrivalTime: '23:20' },
+            { id: 253, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 3, distanceFromSourceKm: 538, departureTime: '06:15', arrivalTime: '06:05' },
+            { id: 254, stationCode: 'LPI', stationName: 'Lingampalli (LPI)', stopSequence: 4, distanceFromSourceKm: 588, departureTime: null, arrivalTime: '07:40' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 18, fare: 2320.00, status: 'AVAILABLE (18)' },
+            { coachType: '2A', availableSeats: 44, fare: 1580.00, status: 'AVAILABLE (44)' },
+            { coachType: '3A', availableSeats: 84, fare: 1120.00, status: 'AVAILABLE (84)' },
+            { coachType: 'SL', availableSeats: 160, fare: 410.00, status: 'AVAILABLE (160)' }
+          ]
+        },
+        {
+          id: 188,
+          trainNumber: '12737',
+          trainName: 'Gowthami Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'LPI',
+          fromStationName: 'Lingampalli (LPI)',
+          toStationCode: 'COA',
+          toStationName: 'Kakinada Port (COA)',
+          departureTime: '21:15',
+          arrivalTime: '08:50',
+          durationHours: 11.58,
+          distanceKm: 588.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 255, stationCode: 'LPI', stationName: 'Lingampalli (LPI)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '21:15', arrivalTime: null },
+            { id: 256, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 2, distanceFromSourceKm: 50, departureTime: '22:15', arrivalTime: '22:05' },
+            { id: 257, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 3, distanceFromSourceKm: 363, departureTime: '03:40', arrivalTime: '03:30' },
+            { id: 258, stationCode: 'COA', stationName: 'Kakinada Port (COA)', stopSequence: 4, distanceFromSourceKm: 588, departureTime: null, arrivalTime: '08:50' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 16, fare: 2320.00, status: 'AVAILABLE (16)' },
+            { coachType: '2A', availableSeats: 40, fare: 1580.00, status: 'AVAILABLE (40)' },
+            { coachType: '3A', availableSeats: 80, fare: 1120.00, status: 'AVAILABLE (80)' },
+            { coachType: 'SL', availableSeats: 155, fare: 410.00, status: 'AVAILABLE (155)' }
+          ]
+        },
+        {
+          id: 189,
+          trainNumber: '12794',
+          trainName: 'Rayalaseema Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'NZB',
+          fromStationName: 'Nizamabad (NZB)',
+          toStationCode: 'TPTY',
+          toStationName: 'Tirupati (TPTY)',
+          departureTime: '14:10',
+          arrivalTime: '06:15',
+          durationHours: 16.08,
+          distanceKm: 825.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 259, stationCode: 'NZB', stationName: 'Nizamabad (NZB)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '14:10', arrivalTime: null },
+            { id: 260, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 2, distanceFromSourceKm: 161, departureTime: '17:25', arrivalTime: '17:20' },
+            { id: 261, stationCode: 'KRNT', stationName: 'Kurnool City (KRNT)', stopSequence: 3, distanceFromSourceKm: 405, departureTime: '22:00', arrivalTime: '21:55' },
+            { id: 262, stationCode: 'TPTY', stationName: 'Tirupati (TPTY)', stopSequence: 4, distanceFromSourceKm: 825, departureTime: null, arrivalTime: '06:15' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 14, fare: 2780.00, status: 'AVAILABLE (14)' },
+            { coachType: '2A', availableSeats: 42, fare: 1890.00, status: 'AVAILABLE (42)' },
+            { coachType: '3A', availableSeats: 82, fare: 1360.00, status: 'AVAILABLE (82)' },
+            { coachType: 'SL', availableSeats: 165, fare: 510.00, status: 'AVAILABLE (165)' }
+          ]
+        },
+        {
+          id: 190,
+          trainNumber: '12793',
+          trainName: 'Rayalaseema Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'TPTY',
+          fromStationName: 'Tirupati (TPTY)',
+          toStationCode: 'NZB',
+          toStationName: 'Nizamabad (NZB)',
+          departureTime: '17:30',
+          arrivalTime: '09:25',
+          durationHours: 15.92,
+          distanceKm: 825.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 263, stationCode: 'TPTY', stationName: 'Tirupati (TPTY)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '17:30', arrivalTime: null },
+            { id: 264, stationCode: 'KRNT', stationName: 'Kurnool City (KRNT)', stopSequence: 2, distanceFromSourceKm: 420, departureTime: '00:45', arrivalTime: '00:40' },
+            { id: 265, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 3, distanceFromSourceKm: 664, departureTime: '06:05', arrivalTime: '05:55' },
+            { id: 266, stationCode: 'NZB', stationName: 'Nizamabad (NZB)', stopSequence: 4, distanceFromSourceKm: 825, departureTime: null, arrivalTime: '09:25' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 12, fare: 2780.00, status: 'AVAILABLE (12)' },
+            { coachType: '2A', availableSeats: 38, fare: 1890.00, status: 'AVAILABLE (38)' },
+            { coachType: '3A', availableSeats: 78, fare: 1360.00, status: 'AVAILABLE (78)' },
+            { coachType: 'SL', availableSeats: 155, fare: 510.00, status: 'AVAILABLE (155)' }
+          ]
+        },
+        {
+          id: 191,
+          trainNumber: '17016',
+          trainName: 'Visakha Express',
+          trainType: 'EXPRESS',
+          fromStationCode: 'SC',
+          fromStationName: 'Secunderabad (SC)',
+          toStationCode: 'BBS',
+          toStationName: 'Bhubaneswar (BBS)',
+          departureTime: '16:50',
+          arrivalTime: '15:25',
+          durationHours: 22.58,
+          distanceKm: 1134.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 267, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '16:50', arrivalTime: null },
+            { id: 268, stationCode: 'GNT', stationName: 'Guntur (GNT)', stopSequence: 2, distanceFromSourceKm: 282, departureTime: '21:45', arrivalTime: '21:40' },
+            { id: 269, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 3, distanceFromSourceKm: 314, departureTime: '22:55', arrivalTime: '22:45' },
+            { id: 270, stationCode: 'VSKP', stationName: 'Visakhapatnam (VSKP)', stopSequence: 4, distanceFromSourceKm: 664, departureTime: '07:50', arrivalTime: '07:30' },
+            { id: 271, stationCode: 'BBS', stationName: 'Bhubaneswar (BBS)', stopSequence: 5, distanceFromSourceKm: 1134, departureTime: null, arrivalTime: '15:25' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 14, fare: 3480.00, status: 'AVAILABLE (14)' },
+            { coachType: '2A', availableSeats: 42, fare: 2260.00, status: 'AVAILABLE (42)' },
+            { coachType: '3A', availableSeats: 84, fare: 1580.00, status: 'AVAILABLE (84)' },
+            { coachType: 'SL', availableSeats: 160, fare: 590.00, status: 'AVAILABLE (160)' }
+          ]
+        },
+        {
+          id: 192,
+          trainNumber: '17015',
+          trainName: 'Visakha Express',
+          trainType: 'EXPRESS',
+          fromStationCode: 'BBS',
+          fromStationName: 'Bhubaneswar (BBS)',
+          toStationCode: 'SC',
+          toStationName: 'Secunderabad (SC)',
+          departureTime: '08:45',
+          arrivalTime: '07:30',
+          durationHours: 22.75,
+          distanceKm: 1134.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 272, stationCode: 'BBS', stationName: 'Bhubaneswar (BBS)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '08:45', arrivalTime: null },
+            { id: 273, stationCode: 'VSKP', stationName: 'Visakhapatnam (VSKP)', stopSequence: 2, distanceFromSourceKm: 470, departureTime: '16:40', arrivalTime: '16:20' },
+            { id: 274, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 3, distanceFromSourceKm: 820, departureTime: '00:45', arrivalTime: '00:35' },
+            { id: 275, stationCode: 'GNT', stationName: 'Guntur (GNT)', stopSequence: 4, distanceFromSourceKm: 852, departureTime: '01:35', arrivalTime: '01:30' },
+            { id: 276, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 5, distanceFromSourceKm: 1134, departureTime: null, arrivalTime: '07:30' }
+          ],
+          availableClasses: [
+            { coachType: '1A', availableSeats: 12, fare: 3480.00, status: 'AVAILABLE (12)' },
+            { coachType: '2A', availableSeats: 40, fare: 2260.00, status: 'AVAILABLE (40)' },
+            { coachType: '3A', availableSeats: 80, fare: 1580.00, status: 'AVAILABLE (80)' },
+            { coachType: 'SL', availableSeats: 150, fare: 590.00, status: 'AVAILABLE (150)' }
+          ]
+        },
+        {
+          id: 193,
+          trainNumber: '17023',
+          trainName: 'Tungabhadra Express',
+          trainType: 'EXPRESS',
+          fromStationCode: 'SC',
+          fromStationName: 'Secunderabad (SC)',
+          toStationCode: 'KRNT',
+          toStationName: 'Kurnool City (KRNT)',
+          departureTime: '07:40',
+          arrivalTime: '12:30',
+          durationHours: 4.83,
+          distanceKm: 244.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 277, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '07:40', arrivalTime: null },
+            { id: 278, stationCode: 'KCG', stationName: 'Kacheguda (KCG)', stopSequence: 2, distanceFromSourceKm: 12, departureTime: '08:05', arrivalTime: '08:00' },
+            { id: 279, stationCode: 'KRNT', stationName: 'Kurnool City (KRNT)', stopSequence: 3, distanceFromSourceKm: 244, departureTime: null, arrivalTime: '12:30' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 110, fare: 390.00, status: 'AVAILABLE (110)' },
+            { coachType: '3A', availableSeats: 64, fare: 580.00, status: 'AVAILABLE (64)' },
+            { coachType: 'SL', availableSeats: 160, fare: 185.00, status: 'AVAILABLE (160)' }
+          ]
+        },
+        {
+          id: 194,
+          trainNumber: '17024',
+          trainName: 'Tungabhadra Express',
+          trainType: 'EXPRESS',
+          fromStationCode: 'KRNT',
+          fromStationName: 'Kurnool City (KRNT)',
+          toStationCode: 'SC',
+          toStationName: 'Secunderabad (SC)',
+          departureTime: '15:00',
+          arrivalTime: '19:50',
+          durationHours: 4.83,
+          distanceKm: 244.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 280, stationCode: 'KRNT', stationName: 'Kurnool City (KRNT)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '15:00', arrivalTime: null },
+            { id: 281, stationCode: 'KCG', stationName: 'Kacheguda (KCG)', stopSequence: 2, distanceFromSourceKm: 232, departureTime: '19:25', arrivalTime: '19:20' },
+            { id: 282, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 3, distanceFromSourceKm: 244, departureTime: null, arrivalTime: '19:50' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 105, fare: 390.00, status: 'AVAILABLE (105)' },
+            { coachType: '3A', availableSeats: 60, fare: 580.00, status: 'AVAILABLE (60)' },
+            { coachType: 'SL', availableSeats: 155, fare: 185.00, status: 'AVAILABLE (155)' }
+          ]
+        },
+        {
+          id: 195,
+          trainNumber: '12721',
+          trainName: 'Dakshin Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'HYB',
+          fromStationName: 'Hyderabad Deccan (HYB)',
+          toStationCode: 'NZM',
+          toStationName: 'Hazrat Nizamuddin (NZM)',
+          departureTime: '23:00',
+          arrivalTime: '04:00',
+          durationHours: 29.0,
+          distanceKm: 1670.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 283, stationCode: 'HYB', stationName: 'Hyderabad Deccan (HYB)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '23:00', arrivalTime: null },
+            { id: 284, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 2, distanceFromSourceKm: 9, departureTime: '23:30', arrivalTime: '23:25' },
+            { id: 285, stationCode: 'BPL', stationName: 'Bhopal (BPL)', stopSequence: 3, distanceFromSourceKm: 978, departureTime: '17:15', arrivalTime: '17:10' },
+            { id: 286, stationCode: 'NZM', stationName: 'Hazrat Nizamuddin (NZM)', stopSequence: 4, distanceFromSourceKm: 1670, departureTime: null, arrivalTime: '04:00' }
+          ],
+          availableClasses: [
+            { coachType: '2A', availableSeats: 44, fare: 3240.00, status: 'AVAILABLE (44)' },
+            { coachType: '3A', availableSeats: 85, fare: 2260.00, status: 'AVAILABLE (85)' },
+            { coachType: 'SL', availableSeats: 150, fare: 850.00, status: 'AVAILABLE (150)' }
+          ]
+        },
+        {
+          id: 196,
+          trainNumber: '12722',
+          trainName: 'Dakshin Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'NZM',
+          fromStationName: 'Hazrat Nizamuddin (NZM)',
+          toStationCode: 'HYB',
+          toStationName: 'Hyderabad Deccan (HYB)',
+          departureTime: '22:50',
+          arrivalTime: '03:50',
+          durationHours: 29.0,
+          distanceKm: 1670.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 287, stationCode: 'NZM', stationName: 'Hazrat Nizamuddin (NZM)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '22:50', arrivalTime: null },
+            { id: 288, stationCode: 'BPL', stationName: 'Bhopal (BPL)', stopSequence: 2, distanceFromSourceKm: 692, departureTime: '09:45', arrivalTime: '09:40' },
+            { id: 289, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 3, distanceFromSourceKm: 1661, departureTime: '03:10', arrivalTime: '03:05' },
+            { id: 290, stationCode: 'HYB', stationName: 'Hyderabad Deccan (HYB)', stopSequence: 4, distanceFromSourceKm: 1670, departureTime: null, arrivalTime: '03:50' }
+          ],
+          availableClasses: [
+            { coachType: '2A', availableSeats: 42, fare: 3240.00, status: 'AVAILABLE (42)' },
+            { coachType: '3A', availableSeats: 80, fare: 2260.00, status: 'AVAILABLE (80)' },
+            { coachType: 'SL', availableSeats: 145, fare: 850.00, status: 'AVAILABLE (145)' }
+          ]
+        },
+        {
+          id: 197,
+          trainNumber: '12806',
+          trainName: 'Janmabhoomi Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'LPI',
+          fromStationName: 'Lingampalli (LPI)',
+          toStationCode: 'VSKP',
+          toStationName: 'Visakhapatnam (VSKP)',
+          departureTime: '06:15',
+          arrivalTime: '19:45',
+          durationHours: 13.5,
+          distanceKm: 720.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 291, stationCode: 'LPI', stationName: 'Lingampalli (LPI)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '06:15', arrivalTime: null },
+            { id: 292, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 2, distanceFromSourceKm: 23, departureTime: '07:05', arrivalTime: '07:00' },
+            { id: 293, stationCode: 'GNT', stationName: 'Guntur (GNT)', stopSequence: 3, distanceFromSourceKm: 305, departureTime: '11:35', arrivalTime: '11:30' },
+            { id: 294, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 4, distanceFromSourceKm: 337, departureTime: '12:55', arrivalTime: '12:45' },
+            { id: 295, stationCode: 'VSKP', stationName: 'Visakhapatnam (VSKP)', stopSequence: 5, distanceFromSourceKm: 720, departureTime: null, arrivalTime: '19:45' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 140, fare: 920.00, status: 'AVAILABLE (140)' },
+            { coachType: '3A', availableSeats: 70, fare: 1260.00, status: 'AVAILABLE (70)' },
+            { coachType: 'SL', availableSeats: 180, fare: 470.00, status: 'AVAILABLE (180)' }
+          ]
+        },
+        {
+          id: 198,
+          trainNumber: '12805',
+          trainName: 'Janmabhoomi Express',
+          trainType: 'SUPERFAST',
+          fromStationCode: 'VSKP',
+          fromStationName: 'Visakhapatnam (VSKP)',
+          toStationCode: 'LPI',
+          toStationName: 'Lingampalli (LPI)',
+          departureTime: '06:20',
+          arrivalTime: '19:40',
+          durationHours: 13.33,
+          distanceKm: 720.0,
+          runningDays: 'MON,TUE,WED,THU,FRI,SAT,SUN',
+          active: true,
+          routes: [
+            { id: 296, stationCode: 'VSKP', stationName: 'Visakhapatnam (VSKP)', stopSequence: 1, distanceFromSourceKm: 0, departureTime: '06:20', arrivalTime: null },
+            { id: 297, stationCode: 'BZA', stationName: 'Vijayawada (BZA)', stopSequence: 2, distanceFromSourceKm: 383, departureTime: '12:35', arrivalTime: '12:25' },
+            { id: 298, stationCode: 'GNT', stationName: 'Guntur (GNT)', stopSequence: 3, distanceFromSourceKm: 415, departureTime: '13:35', arrivalTime: '13:30' },
+            { id: 299, stationCode: 'SC', stationName: 'Secunderabad (SC)', stopSequence: 4, distanceFromSourceKm: 697, departureTime: '18:40', arrivalTime: '18:35' },
+            { id: 300, stationCode: 'LPI', stationName: 'Lingampalli (LPI)', stopSequence: 5, distanceFromSourceKm: 720, departureTime: null, arrivalTime: '19:40' }
+          ],
+          availableClasses: [
+            { coachType: 'CC', availableSeats: 135, fare: 920.00, status: 'AVAILABLE (135)' },
+            { coachType: '3A', availableSeats: 68, fare: 1260.00, status: 'AVAILABLE (68)' },
+            { coachType: 'SL', availableSeats: 175, fare: 470.00, status: 'AVAILABLE (175)' }
           ]
         }
       ],
