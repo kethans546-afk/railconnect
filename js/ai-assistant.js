@@ -345,16 +345,21 @@
       this.appendAIMessage(LANGUAGES[this.currentLang].welcome);
     }
 
-    renderSuggestions() {
+    renderSuggestions(customSuggestions = null) {
       const container = document.getElementById('rcAiSuggestions');
       if (!container) return;
-      const chips = SUGGESTIONS[this.currentLang] || SUGGESTIONS.en;
+      const chips = customSuggestions || SUGGESTIONS[this.currentLang] || SUGGESTIONS.en;
 
       container.innerHTML = chips.map(chip => `
         <button class="rc-ai-chip" onclick="window.RailConnectAI.sendQuery('${chip.replace(/'/g, "\\'")}')">
           ${chip}
         </button>
       `).join('');
+    }
+
+    sendQuery(text) {
+      this.openChat();
+      this.sendUserMessage(text);
     }
 
     appendUserMessage(text) {
@@ -452,14 +457,22 @@
 
         this.hideTypingIndicator();
 
-        if (response && response.reply) {
+        const textReply = response ? (response.response || response.reply) : null;
+        if (textReply) {
           if (response.language && response.language !== this.currentLang && LANGUAGES[response.language]) {
             this.setLanguage(response.language);
           }
-          this.appendAIMessage(response.reply, response.trains, response.executionMode);
-          this.lastSpokenText = response.reply;
+          const trains = response.trains || (response.structuredData && response.structuredData.trains) || [];
+          this.appendAIMessage(textReply, trains, response.executionMode);
+          this.lastSpokenText = textReply;
+
+          if (response.suggestedQuestions && response.suggestedQuestions.length > 0) {
+            this.renderSuggestions(response.suggestedQuestions);
+          } else if (response.suggestedNextQueries && response.suggestedNextQueries.length > 0) {
+            this.renderSuggestions(response.suggestedNextQueries);
+          }
         } else {
-          this.appendAIMessage("I've received your query. Please check your train route or provide your 10-digit PNR for instant assistance.");
+          this.appendAIMessage("I've received your query. Please ask about train search (e.g. 'Search trains Chennai to Trichy'), live PNR status, seat availability, or route weather.");
         }
       } catch (err) {
         console.warn('[RailConnect AI Error]:', err);
@@ -591,17 +604,22 @@
           });
         }
 
-        const reply = (result && result.reply) ? result.reply : "Here are the matching trains and journey updates for your query.";
-        this.lastSpokenText = reply;
+        const textReply = result ? (result.response || result.reply) : "Here are the matching trains and journey updates for your query.";
+        this.lastSpokenText = textReply;
+        const trains = result ? (result.trains || (result.structuredData && result.structuredData.trains) || []) : [];
 
         if (statusText) statusText.textContent = 'Speaking response...';
 
         // Update chat window feed as well
         this.appendUserMessage(finalText);
-        this.appendAIMessage(reply, result ? result.trains : [], result ? result.executionMode : 'AUTONOMOUS_DOMAIN_AI');
+        this.appendAIMessage(textReply, trains, result ? result.executionMode : 'AUTONOMOUS_DOMAIN_AI');
+
+        if (result && result.suggestedQuestions) {
+          this.renderSuggestions(result.suggestedQuestions);
+        }
 
         // Play audio TTS
-        this.speakResponse(reply, result && result.audioBase64 ? result.audioBase64 : null);
+        this.speakResponse(textReply, result && result.audioBase64 ? result.audioBase64 : null);
       } catch (e) {
         console.warn('[Voice Process Error]:', e);
         const fallbackReply = "I received your voice instruction. Displaying train details and booking options on screen.";

@@ -196,55 +196,204 @@ const Api = {
       return { languageCode: code, detectedScript: code.toUpperCase(), confidence: 0.95 };
     }
     if (endpoint === '/ai/chat') {
-      const msg = (body.message || '').toLowerCase();
-      const lang = body.language || 'en';
+      const msg = (body.message || '').trim();
+      const lower = msg.toLowerCase();
+      let lang = body.language || 'en';
+
+      // Auto-detect language script
+      if (/[\u0C00-\u0C7F]/.test(msg)) lang = 'te';
+      else if (/[\u0B80-\u0BFF]/.test(msg)) lang = 'ta';
+      else if (/[\u0C80-\u0CFF]/.test(msg)) lang = 'kn';
+      else if (/[\u0D00-\u0D7F]/.test(msg)) lang = 'ml';
+      else if (/[\u0980-\u09FF]/.test(msg)) lang = 'bn';
+      else if (/[\u0900-\u097F]/.test(msg) && lang !== 'mr') lang = 'hi';
+
       let reply = '';
       let intent = 'GENERAL_QUERY';
       let trainCards = [];
+      let suggestedQuestions = [];
 
-      if (msg.includes('train') || msg.includes('search') || msg.includes('ರೈಲು') || msg.includes('ரயில்') || msg.includes('రైలు') || msg.includes('ट्रेन')) {
-        intent = 'TRAIN_SEARCH';
-        trainCards = [
-          { trainNumber: '20608', trainName: 'Vande Bharat Express', departureTime: '06:00', arrivalTime: '10:40', durationHours: '4h 40m', availableSeats: 48, fare: 950 },
-          { trainNumber: '12008', trainName: 'Shatabdi Express', departureTime: '15:15', arrivalTime: '20:10', durationHours: '4h 55m', availableSeats: 32, fare: 870 }
-        ];
-        if (lang === 'te') reply = 'మీ కోసం 2 ప్రీమియం రైళ్లు అందుబాటులో ఉన్నాయి:\n1. 20608 వందే భారత్ ఎక్స్‌ప్రెస్ (ఉదయం 06:00, 48 సీట్లు లభ్యం)\n2. 12008 శతాబ్ది ఎక్స్‌ప్రెస్ (మధ్యాహ్నం 15:15, 32 సీట్లు లభ్యం)';
-        else if (lang === 'hi') reply = 'आपके लिए 2 प्रीमियम ट्रेनें उपलब्ध हैं:\n1. 20608 वंदे भारत एक्सप्रेस (06:00, 48 सीटें उपलब्ध)\n2. 12008 शताब्दी एक्सप्रेस (15:15, 32 सीटें उपलब्ध)';
-        else if (lang === 'ta') reply = 'உங்களுக்காக 2 விரைவு ரயில்கள் கிடைக்கின்றன:\n1. 20608 வந்தே பாரத் எக்ஸ்பிரஸ் (காலை 06:00, 48 இருக்கைகள்)\n2. 12008 சதாப்தி எக்ஸ்பிரஸ் (மாலை 15:15, 32 இருக்கைகள்)';
-        else if (lang === 'kn') reply = 'ನಿಮಗಾಗಿ 2 ಪ್ರೀಮಿಯಂ ರೈಲುಗಳು ಲಭ್ಯವಿವೆ:\n1. 20608 ವಂದೇ ಭಾರತ್ ಎಕ್ಸ್‌ಪ್ರೆಸ್ (ಬೆಳಿಗ್ಗೆ 06:00, 48 ಸೀಟುಗಳು ಲಭ್ಯ)\n2. 12008 ಶತಾಬ್ದಿ ಎಕ್ಸ್‌ಪ್ರೆಸ್ (ಮಧ್ಯಾಹ್ನ 15:15, 32 ಸೀಟುಗಳು ಲಭ್ಯ)';
-        else reply = 'Found 2 premium express trains for your corridor:\n1. 20608 Vande Bharat Express (Departs 06:00, 48 Seats Available)\n2. 12008 Shatabdi Express (Departs 15:15, 32 Seats Available)';
-      } else if (msg.includes('pnr') || msg.includes('status')) {
+      // Check for 10-digit PNR in message
+      const pnrMatch = msg.match(/\b\d{10}\b/);
+      const isPnrQuery = !!pnrMatch || lower.includes('pnr') || lower.includes('status') ||
+        lower.includes('పిఎన్‌ఆర్') || lower.includes('పిఎన్ఆర్') || lower.includes('స్టేటస్') ||
+        lower.includes('पीएनआर') || lower.includes('स्थिति') ||
+        lower.includes('பிஎன்ஆர்') || lower.includes('நிலை') ||
+        lower.includes('ಪಿಎನ್‌ಆರ್') || lower.includes('സ്ഥിതി') ||
+        lower.includes('പിഎൻആർ') || lower.includes('പരിശോധിക്കുക') ||
+        lower.includes('স্ট্যাটাস') || lower.includes('स्थिती');
+
+      const isTrainSearch = lower.includes('train') || lower.includes('search') || lower.includes('express') ||
+        lower.includes('రైలు') || lower.includes('రైళ్లు') || lower.includes('రైళ్ల') || lower.includes('ట్రైన్') || lower.includes('చూపించు') ||
+        lower.includes('ट्रेन') || lower.includes('गाड़ी') || lower.includes('रेल') || lower.includes('खोज') ||
+        lower.includes('ரயில்') || lower.includes('ரயில்கள்') || lower.includes('வண்டி') ||
+        lower.includes('ರೈಲು') || lower.includes('ರೈಲುಗಳು') || lower.includes('ಹುಡುಕಿ') ||
+        lower.includes('ട്രെയിൻ') || lower.includes('ട്രെയിനുകൾ') || lower.includes('വണ്ടി') ||
+        lower.includes('ট্রেন') || lower.includes('অনুসন্ধান') ||
+        lower.includes('गाड्या') || lower.includes('गाडी') || lower.includes('शोधा');
+
+      const isWeatherQuery = lower.includes('weather') || lower.includes('rain') || lower.includes('climate') ||
+        lower.includes('వాతావరణ') || lower.includes('వర్షం') ||
+        lower.includes('मौसम') || lower.includes('बारिश') ||
+        lower.includes('வானிலை') || lower.includes('மழை') ||
+        lower.includes('ಹವಾಮಾನ') || lower.includes('ಮಳೆ') ||
+        lower.includes('കാലാവസ്ഥ') || lower.includes('আবহাওয়া') || lower.includes('हवामान');
+
+      const isTatkalQuery = lower.includes('tatkal') || lower.includes('rule') || lower.includes('procedure') ||
+        lower.includes('తత్కాల్') || lower.includes('तत्काल') || lower.includes('தட்கல்') || lower.includes('ತತ್ಕಾಲ್') || lower.includes('തത്കാൽ') || lower.includes('তৎকাল');
+
+      const isBerthQuery = lower.includes('berth') || lower.includes('exchange') || lower.includes('swap') ||
+        lower.includes('బర్త్') || lower.includes('बर्थ') || lower.includes('பர்த்') || lower.includes('ಬರ್ತ್') || lower.includes('ബർത്ത്') || lower.includes('বার্থ');
+
+      if (isPnrQuery) {
         intent = 'PNR_STATUS';
-        reply = lang === 'te' ? 'పిఎన్‌ఆర్ విచారణ: మీ 10 అంకెల పిఎన్‌ఆర్ నంబర్‌ను పంపండి, మీ బుకింగ్ మరియు సీటు వివరాలను నేను తక్షణమే తనిఖీ చేస్తాను.' :
-                lang === 'hi' ? 'पीएनआर स्थिति: कृपया अपना 10 अंकों का पीएनआर नंबर दर्ज करें। मैं तुरंत आपकी सीट और कोच स्थिति दिखाऊंगा।' :
-                'PNR Status: Please provide your 10-digit PNR number to check live confirmation, coach, and berth allocation.';
-      } else if (msg.includes('weather') || msg.includes('rain') || msg.includes('వాతావరణ') || msg.includes('मौसम') || msg.includes('வானிலை')) {
+        const pnrNum = pnrMatch ? pnrMatch[0] : '4827193056';
+        let b = null;
+        if (pnrMatch) {
+          b = mock.getPnrStatus(pnrNum);
+        }
+        if (!b) {
+          b = mock.getPnrStatus('4827193056') || {
+            pnr: pnrNum,
+            trainNumber: '12638',
+            trainName: 'Pandian Superfast Express',
+            fromStationName: 'TPJ (Tiruchirappalli)',
+            toStationName: 'MAS (Chennai Central)',
+            journeyDate: '2026-10-15',
+            coachCode: 'B1',
+            passengers: [{ name: 'Rahul Sharma', coach: 'B1', seatNumber: 1, berthType: 'LOWER', status: 'CONFIRMED' }]
+          };
+        }
+
+        const pName = b.passengers?.[0]?.name || 'Passenger 1';
+        const pCoach = b.passengers?.[0]?.coach || b.coachCode || 'B1';
+        const pSeat = b.passengers?.[0]?.seatNumber || 1;
+        const pBerth = b.passengers?.[0]?.berthType || 'LOWER';
+        const pStatus = b.status || 'CONFIRMED';
+
+        if (lang === 'te') {
+          reply = `పిఎన్‌ఆర్ విచారణ (${b.pnr || pnrNum}):\n🚆 రైలు: ${b.trainNumber} - ${b.trainName}\n📍 ప్రయాణం: ${b.fromStationName || b.fromStation} ➔ ${b.toStationName || b.toStation}\n📅 తేదీ: ${b.journeyDate}\n👤 ప్రయాణికుడు: ${pName}\n💺 కోచ్ & సీటు: కోచ్ ${pCoach}, సీటు #${pSeat} (${pBerth})\n✅ స్థితి: ${pStatus}`;
+          suggestedQuestions = ['ప్రయాణ మార్గ వాతావరణం', 'బర్త్ ఎక్స్‌చేంజ్ విధానం', 'రైలు సమయాలు'];
+        } else if (lang === 'hi') {
+          reply = `पीएनआर स्थिति (${b.pnr || pnrNum}):\n🚆 ट्रेन: ${b.trainNumber} - ${b.trainName}\n📍 मार्ग: ${b.fromStationName || b.fromStation} ➔ ${b.toStationName || b.toStation}\n📅 यात्रा तिथि: ${b.journeyDate}\n👤 यात्री: ${pName}\n💺 कोच व सीट: कोच ${pCoach}, सीट #${pSeat} (${pBerth})\n✅ आरक्षण स्थिति: ${pStatus}`;
+          suggestedQuestions = ['मार्ग मौसम चेतावनी', 'बर्थ एक्सचेंज गाइड', 'तत्काल बुकिंग नियम'];
+        } else if (lang === 'ta') {
+          reply = `பிஎன்ஆர் நிலை (${b.pnr || pnrNum}):\n🚆 ரயில்: ${b.trainNumber} - ${b.trainName}\n📍 பயணம்: ${b.fromStationName || b.fromStation} ➔ ${b.toStationName || b.toStation}\n📅 தேதி: ${b.journeyDate}\n👤 பயணி: ${pName}\n💺 இருக்கை: கோச் ${pCoach}, இருக்கை #${pSeat} (${pBerth})\n✅ உறுதிப்படுத்தல்: ${pStatus}`;
+          suggestedQuestions = ['வானிலை தகவல்', 'பர்த் எக்ஸ்சேஞ்ச் உதவி', 'ரயில் தேடல்'];
+        } else if (lang === 'kn') {
+          reply = `ಪಿಎನ್‌ಆರ್ ಸ್ಥಿತಿ (${b.pnr || pnrNum}):\n🚆 ರೈಲು: ${b.trainNumber} - ${b.trainName}\n📍 ಮಾರ್ಗ: ${b.fromStationName || b.fromStation} ➔ ${b.toStationName || b.toStation}\n📅 ದಿನಾಂಕ: ${b.journeyDate}\n👤 ಪ್ರಯಾಣಿಕ: ${pName}\n💺 ಕೋಚ್ & ಸೀಟು: ಕೋಚ್ ${pCoach}, ಸೀಟು #${pSeat} (${pBerth})\n✅ ಸ್ಥಿತಿ: ${pStatus}`;
+          suggestedQuestions = ['ಹವಾಮಾನ ಎಚ್ಚರಿಕೆ', 'ಬರ್ತ್ ವಿನಿಮಯ', 'ರೈಲುಗಳನ್ನು ಹುಡುಕಿ'];
+        } else {
+          reply = `PNR Status for ${b.pnr || pnrNum}:\n🚆 Train: ${b.trainNumber} • ${b.trainName}\n📍 Route: ${b.fromStationName || b.fromStation} ➔ ${b.toStationName || b.toStation}\n📅 Date: ${b.journeyDate}\n👤 Passenger: ${pName}\n💺 Berth: Coach ${pCoach}, Seat #${pSeat} (${pBerth})\n✅ Booking Status: ${pStatus}`;
+          suggestedQuestions = ['Route Weather Advisory', 'Berth Exchange Guide', 'Search trains Chennai to Trichy'];
+        }
+      } else if (isTrainSearch) {
+        intent = 'TRAIN_SEARCH';
+        let matched = [];
+        if (lower.includes('bengaluru') || lower.includes('bangalore') || lower.includes('sbc')) {
+          matched = mock.searchTrains('SBC', 'MAS');
+        } else {
+          matched = mock.searchTrains('MAS', 'TPJ');
+        }
+        if (!matched || matched.length === 0) {
+          matched = mock.searchTrains('MAS', 'TPJ');
+        }
+
+        trainCards = matched.slice(0, 3).map(t => ({
+          trainNumber: t.trainNumber,
+          trainName: t.trainName,
+          departureTime: t.departureTime || '06:00',
+          arrivalTime: t.arrivalTime || '10:40',
+          durationHours: t.durationHours ? `${t.durationHours}h` : '4h 40m',
+          availableSeats: t.availableSeats || 48,
+          fare: t.fare || 667
+        }));
+
+        if (lang === 'te') {
+          reply = `మీ ప్రయాణ మార్గంలో అందుబాటులో ఉన్న రైళ్లు ఇవిగో:\n1. 20608 వందే భారత్ ఎక్స్‌ప్రెస్ (ఉదయం 06:00, 48 సీట్లు లభ్యం)\n2. 12638 పాండియన్ సూపర్ ఫాస్ట్ (రాత్రి 21:35, 62 సీట్లు లభ్యం)\n3. 12008 శతాబ్ది ఎక్స్‌ప్రెస్ (మధ్యాహ్నం 15:15, 32 సీట్లు లభ్యం)\nఏ రైలునైనా సులభంగా బుక్ చేసుకోండి!`;
+          suggestedQuestions = ['పిఎన్‌ఆర్ స్టేటస్', 'వాతావరణ హెచ్చరికలు', 'తత్కాల్ బుకింగ్ నిబంధనలు'];
+        } else if (lang === 'hi') {
+          reply = `आपके यात्रा मार्ग पर उपलब्ध ट्रेनें:\n1. 20608 वंदे भारत एक्सप्रेस (प्रस्थान 06:00, 48 सीटें उपलब्ध)\n2. 12638 पांडियन सुपरफास्ट एक्सप्रेस (प्रस्थान 21:35, 62 सीटें उपलब्ध)\n3. 12008 शताब्दी एक्सप्रेस (प्रस्थान 15:15, 32 सीटें उपलब्ध)\nकृपया अपनी पसंदीदा ट्रेन चुनें और टिकट बुक करें।`;
+          suggestedQuestions = ['पीएनआर स्थिति जांचें', 'मौसम अलर्ट देखें', 'तत्काल बुकिंग नियम'];
+        } else if (lang === 'ta') {
+          reply = `உங்கள் வழித்தடத்திற்கான விரைவு ரயில்கள்:\n1. 20608 வந்தே பாரத் எக்ஸ்பிரஸ் (காலை 06:00, 48 இருக்கைகள்)\n2. 12638 பாண்டியன் அதிவிரைவு ரயில் (இரவு 21:35, 62 இருக்கைகள்)\n3. 12008 சதாப்தி எக்ஸ்பிரஸ் (மாலை 15:15, 32 இருக்கைகள்)\nஇப்போதே டிக்கெட் முன்பதிவு செய்யலாம்!`;
+          suggestedQuestions = ['பிஎன்ஆர் நிலை', 'வானிலை தகவல்', 'தட்கல் விதிகள்'];
+        } else if (lang === 'kn') {
+          reply = `ನಿಮ್ಮ ಮಾರ್ಗದಲ್ಲಿ ಲಭ್ಯವಿರುವ ಪ್ರಮುಖ ರೈಲುಗಳು:\n1. 20608 ವಂದೇ ಭಾರತ್ ಎಕ್ಸ್‌ಪ್ರೆಸ್ (ಬೆಳಿಗ್ಗೆ 06:00, 48 ಸೀಟುಗಳು ಲಭ್ಯ)\n2. 12638 ಪಾಂಡಿಯನ್ ಸೂಪರ್‌ಫಾಸ್ಟ್ (ರಾತ್ರಿ 21:35, 62 ಸೀಟುಗಳು ಲಭ್ಯ)\n3. 12008 ಶತಾಬ್ದಿ ಎಕ್ಸ್‌ಪ್ರೆಸ್ (ಮಧ್ಯಾಹ್ನ 15:15, 32 ಸೀಟುಗಳು ಲಭ್ಯ)`;
+          suggestedQuestions = ['ಪಿಎನ್‌ಆರ್ ಸ್ಥಿತಿ', 'ಹವಾಮಾನ ಎಚ್ಚರಿಕೆ', 'ತತ್ಕಾಲ್ ನಿಯಮಗಳು'];
+        } else if (lang === 'ml') {
+          reply = `നിങ്ങൾക്കായി ലഭ്യമായ പ്രധാന ട്രെയിനുകൾ:\n1. 20608 വന്ദേ ഭാരത് എക്സ്പ്രസ്സ് (06:00, 48 സീറ്റുകൾ ലഭ്യമാണ്)\n2. 12638 പാണ്ഡ്യൻ സൂപ്പർഫാസ്റ്റ് (21:35, 62 സീറ്റുകൾ ലഭ്യമാണ്)\n3. 12008 ശതാബ്ദി എക്സ്പ്രസ്സ് (15:15, 32 സീറ്റുകൾ ലഭ്യമാണ്)`;
+          suggestedQuestions = ['പിഎൻആർ പരിശോധിക്കുക', 'കാലാവസ്ഥാ മുന്നറിയിപ്പ്', 'തത്കാൽ നിയമങ്ങൾ'];
+        } else if (lang === 'bn') {
+          reply = `আপনার ভ্রমণ পথের ট্রেন সমূহ:\n1. 20608 বন্দে ভারত এক্সপ্রেস (সকাল 06:00, 48 টি আসন উপলব্ধ)\n2. 12638 পান্ডিয়ান সুপারফাস্ট (রাত 21:35, 62 টি আসন উপলব্ধ)\n3. 12008 শতাব্দী এক্সপ্রেস (বিকেল 15:15, 32 টি আসন উপলব্ধ)`;
+          suggestedQuestions = ['পিএনআর স্ট্যাটাস', 'আবহাওয়া সতর্কতা', 'তৎকাল বুকিং নিয়ম'];
+        } else if (lang === 'mr') {
+          reply = `आपल्या मार्गावरील उपलब्ध गाड्या:\n1. 20608 वंदे भारत एक्सप्रेस (सकाळी 06:00, 48 जागा उपलब्ध)\n2. 12638 पांडियन सुपरफास्ट (रात्री 21:35, 62 जागा उपलब्ध)\n3. 12008 शताब्दी एक्सप्रेस (दुपारी 15:15, 32 जागा उपलब्ध)`;
+          suggestedQuestions = ['पीएनआर स्थिती', 'हवामान अंदाज', 'तत्काळ बुकिंग नियम'];
+        } else {
+          reply = `Found 3 direct express trains for your corridor:\n1. 20608 Vande Bharat Express (Departs 06:00 • 4h 40m • 48 Seats Available • ₹950)\n2. 12638 Pandian Superfast Express (Departs 21:35 • 7h 40m • 62 Seats Available • ₹530)\n3. 12008 Shatabdi Express (Departs 15:15 • 4h 55m • 32 Seats Available • ₹870)\nClick "Book Now" on any card below to proceed!`;
+          suggestedQuestions = ['Check PNR Status', 'Route Weather Advisory', 'Tatkal Booking Rules', 'Berth Exchange Guide'];
+        }
+      } else if (isWeatherQuery) {
         intent = 'WEATHER_ALERT';
-        reply = lang === 'te' ? 'ప్రయాణ మార్గ వాతావరణం: తిరుచ్చిలో 32°C సాధారణం, చెన్నైలో వర్షం సూచన (80% వర్షపాతం, 29°C). ప్రయాణానికి గొడుగు సిద్ధం చేసుకోండి.' :
-                lang === 'hi' ? 'मार्ग मौसम चेतावनी: तिरुचि में 32°C सामान्य है, चेन्नई में भारी बारिश का अलर्ट (80% वर्षा, 29°C) है। कृपया सावधानी बरतें।' :
-                'Route Weather Advisory: Trichy (32°C Clear) ➔ Chennai Central (29°C Rain Warning, 80% precipitation). Have a safe journey!';
-      } else if (msg.includes('berth') || msg.includes('exchange') || msg.includes('swap') || msg.includes('बर्थ') || msg.includes('బర్త్')) {
+        if (lang === 'te') {
+          reply = 'ప్రయాణ మార్గ వాతావరణం: తిరుచ్చిలో 32°C సాధారణం, చెన్నైలో తేలికపాటి వర్షం సూచన (80% వర్షపాతం, 29°C). ప్రయాణ సమయంలో గొడుగు సిద్ధం చేసుకోండి.';
+          suggestedQuestions = ['చెన్నై నుంచి తిరుచ్చి రైళ్లు', 'పిఎన్‌ఆర్ స్టేటస్'];
+        } else if (lang === 'hi') {
+          reply = 'मार्ग मौसम चेतावनी: तिरुचि में 32°C सामान्य है, चेन्नई सेंट्रल में हल्की वर्षा का पूर्वानुमान (80% वर्षा, 29°C) है। कृपया अपनी यात्रा में सावधानी बरतें।';
+          suggestedQuestions = ['चेन्नई से तिरुचि ट्रेन खोजें', 'पीएनआर स्थिति जांचें'];
+        } else if (lang === 'ta') {
+          reply = 'பயண வானிலை அறிக்கை: திருச்சியில் 32°C மிதமான வானிலை, சென்னையில் மழை எச்சரிக்கை (80% மழைப்பொழிவு, 29°C). குடை எடுத்துச் செல்வது நல்லது.';
+          suggestedQuestions = ['சென்னை முதல் திருச்சி ரயில்கள்', 'பிஎன்ஆர் நிலை'];
+        } else if (lang === 'kn') {
+          reply = 'ಮಾರ್ಗ ಹವಾಮಾನ ಮುನ್ಸೂಚನೆ: ತಿರುಚಿಯಲ್ಲಿ 32°C ಸಾಧಾರಣ, ಚೆನ್ನೈನಲ್ಲಿ ಮಳೆ ಮುನ್ಸೂಚನೆ (80% ಮಳೆ, 29°C). ಸುರಕ್ಷಿತವಾಗಿ ಪ್ರಯಾಣಿಸಿ.';
+          suggestedQuestions = ['ಬೆಂಗಳೂರು ರೈಲುಗಳನ್ನು ಹುಡುಕಿ', 'ಪಿಎನ್‌ಆರ್ ಸ್ಥಿತಿ'];
+        } else {
+          reply = 'Corridor Weather Advisory: Trichy (32°C Clear Skies) ➔ Chennai Central (29°C Rain Warning, 80% precipitation). Umbrella recommended. Safe travels!';
+          suggestedQuestions = ['Search trains Chennai to Trichy', 'Check PNR Status'];
+        }
+      } else if (isTatkalQuery) {
+        intent = 'BOOKING_RULES';
+        if (lang === 'te') {
+          reply = 'తత్కాల్ బుకింగ్ నిబంధనలు:\n• AC తరగతులకు (2A, 3A, CC, EC): ప్రయాణానికి 1 రోజు ముందు ఉదయం 10:00 గంటలకు ప్రారంభమవుతుంది.\n• Non-AC తరగతులకు (SL): ప్రయాణానికి 1 రోజు ముందు ఉదయం 11:00 గంటలకు ప్రారంభమవుతుంది.\n• ధృవీకరించబడిన తత్కాల్ టిక్కెట్లకు రద్దు రీఫండ్ వర్తించదు.';
+        } else if (lang === 'hi') {
+          reply = 'तत्काल बुकिंग नियम:\n• एसी क्लास (2A, 3A, CC, EC): यात्रा से 1 दिन पूर्व सुबह 10:00 बजे खुलता है।\n• नॉन-एसी क्लास (SL): यात्रा से 1 दिन पूर्व सुबह 11:00 बजे खुलता है।\n• कन्फर्म तत्काल टिकटों पर कैंसिलेशन रिफंड देय नहीं है।';
+        } else {
+          reply = 'Tatkal Booking Guidelines:\n• AC Classes (2A, 3A, CC, EC): Opens at 10:00 AM, one day prior to journey date.\n• Non-AC Classes (Sleeper): Opens at 11:00 AM, one day prior to journey date.\n• Confirmed Tatkal tickets have zero cancellation refund as per Indian Railways rules.';
+        }
+        suggestedQuestions = ['Search trains Chennai to Trichy', 'Check PNR Status', 'Route Weather Advisory'];
+      } else if (isBerthQuery) {
         intent = 'BERTH_EXCHANGE';
-        reply = lang === 'te' ? 'బర్త్ ఎక్స్‌చేంజ్: రైల్‌కనెక్ట్ P2P వ్యవస్థ ద్వారా మీ రైలులోని ఇతర ప్రయాణికులతో మీ లోయర్/అప్పర్ బర్త్‌ను పరస్పర సమ్మతితో మార్చుకోవచ్చు.' :
-                'RailConnect P2P Berth Exchange lets confirmed passengers propose and accept seat swaps within the same coach.';
+        if (lang === 'te') {
+          reply = 'బర్త్ ఎక్స్‌చేంజ్ ఫీచర్: రైల్‌కనెక్ట్ P2P వ్యవస్థ ద్వారా ఒకే కోచ్‌లోని ఇతర ధృవీకరించబడిన ప్రయాణికులతో మీ బర్త్‌ను (ఉదా. అప్పర్ బర్త్ నుంచి లోయర్ బర్త్‌కి) పరస్పర సమ్మతితో మార్చుకోవచ్చు.';
+        } else if (lang === 'hi') {
+          reply = 'बर्थ एक्सचेंज फीचर: रेलकनेक्ट P2P सिस्टम के माध्यम से एक ही कोच के अन्य कन्फर्म यात्रियों के साथ आप अपनी सीट/बर्थ आपसी सहमति से बदल सकते हैं।';
+        } else {
+          reply = 'RailConnect P2P Berth Exchange: Confirmed passengers can propose and accept voluntary seat swaps with co-passengers in the same coach (e.g. trading an Upper berth for a Lower berth).';
+        }
+        suggestedQuestions = ['Search trains Chennai to Trichy', 'Check PNR Status'];
       } else {
-        reply = lang === 'te' ? 'నమస్కారం! నేను రైల్‌కనెక్ట్ AI అసిస్టెంట్. రైలు శోధన, పిఎన్‌ఆర్, సీట్ల లభ్యత మరియు వాతావరణం గురించి సహాయం చేయగలను.' :
-                lang === 'hi' ? 'नमस्ते! मैं रेलकनेक्ट एआई सहायक हूँ। ट्रेन खोज, पीएनआर स्थिति, सीट उपलब्धता एवं मौसम अलर्ट के लिए पूछें।' :
-                lang === 'ta' ? 'வணக்கம்! நான் ரயில் கனெக்ட் AI உதவியாளர். ரயில் தேடல், பிஎன்ஆர், மற்றும் இருக்கை விவரங்களுக்கு கேளுங்கள்.' :
-                lang === 'kn' ? 'ನಮಸ್ಕಾರ! ನಾನು ರೈಲ್‌ಕನೆಕ್ಟ್ AI ಸಹಾಯಕ. ರೈಲು ಹುಡುಕಾಟ, ಪಿಎನ್‌ಆರ್ ಮತ್ತು ಹವಾಮಾನಕ್ಕಾಗಿ ಕೇಳಿ.' :
-                lang === 'ml' ? 'നമസ്കാരം! ഞാൻ റെയിൽകണക്റ്റ് AI അസിസ്റ്റന്റാണ്. ട്രെയിൻ തിരയൽ, പിഎൻആർ, സീറ്റ് ലഭ്യത എന്നിവയ്ക്ക് എന്നോട് ചോദിക്കാം.' :
-                lang === 'bn' ? 'নমস্কার! আমি রেলকানেক্ট এআই সহায়ক। ট্রেন অনুসন্ধান, পিএনআর স্থিতি ও আবহাওয়া সতর্কতার জন্য আমাকে জিজ্ঞাসা করুন।' :
-                lang === 'mr' ? 'नमस्कार! मी रेलकनेक्ट एआय सहाय्यक आहे. गाडी शोधणे, पीएनआर स्थिती आणि हवामानासाठी मला विचारा.' :
-                'Hello! Welcome to RailConnect AI Assistant. I can help you search trains, check bookings, live PNR, seat availability, weather advisories, and booking rules.';
+        if (lang === 'te') reply = 'నమస్కారం! నేను రైల్‌కనెక్ట్ AI అసిస్టెంట్. రైలు శోధన, లైవ్ పిఎన్‌ఆర్, సీట్ల లభ్యత, వాతావరణం మరియు ప్రయాణ నియమాల్లో నేను మీకు సహాయపడగలను. మీకు ఏమి కావాలి?';
+        else if (lang === 'hi') reply = 'नमस्ते! मैं रेलकनेक्ट एआई सहायक हूँ। ट्रेन खोज, पीएनआर स्थिति, सीट उपलब्धता, यात्रा मौसम एवं नियमों में मैं आपकी सहायता कर सकता हूँ।';
+        else if (lang === 'ta') reply = 'வணக்கம்! நான் ரயில் கனெக்ட் AI உதவியாளர். ரயில் தேடல், பிஎன்ஆர், மற்றும் இருக்கை விவரங்களுக்கு நான் உதவ முடியும். நான் உங்களுக்கு எவ்வாறு உதவட்டும்?';
+        else if (lang === 'kn') reply = 'ನಮಸ್ಕಾರ! ನಾನು ರೈಲ್‌ಕನೆಕ್ಟ್ AI ಸಹಾಯಕ. ರೈಲು ಹುಡುಕಾಟ, ಪಿಎನ್‌ಆರ್ ಮತ್ತು ಹವಾಮಾನಕ್ಕಾಗಿ ನಾನು ಸಹಾಯ ಮಾಡಬಲ್ಲೆ.';
+        else if (lang === 'ml') reply = 'നമസ്കാരം! ഞാൻ റെയിൽകണക്റ്റ് AI അസിസ്റ്റന്റാണ്. ട്രെയിൻ തിരയൽ, പിഎൻആർ, സീറ്റ് ലഭ്യത എന്നിവയ്ക്ക് എന്നോട് ചോദിക്കാം.';
+        else if (lang === 'bn') reply = 'নমস্কার! আমি রেলকানেক্ট এআই সহায়ক। ট্রেন অনুসন্ধান, পিএনআর স্থিতি ও আবহাওয়া সতর্কতার জন্য আমাকে জিজ্ঞাসা করুন।';
+        else if (lang === 'mr') reply = 'नमस्कार! मी रेलकनेक्ट एआय सहाय्यक आहे. गाडी शोधणे, पीএনआर स्थिती आणि हवामानासाठी मला विचारा.';
+        else reply = 'Hello! Welcome to RailConnect AI Assistant. I can help you search trains, check bookings, live PNR status, seat availability, weather advisories, and booking rules.';
+
+        suggestedQuestions = ['Search trains Chennai to Trichy', 'Check PNR Status', 'Route Weather Advisory', 'Tatkal Booking Rules'];
       }
 
       return {
         reply,
+        response: reply,
         language: lang,
         intent,
         trains: trainCards,
         executionMode: 'AUTONOMOUS_DOMAIN_AI',
-        suggestedNextQueries: ['Search trains Chennai to Trichy', 'PNR Status 8492019482', 'Route Weather Advisory', 'Tatkal Booking Rules']
+        suggestedQuestions,
+        suggestedNextQueries: suggestedQuestions
       };
     }
     if (endpoint === '/ai/voice/process') {
