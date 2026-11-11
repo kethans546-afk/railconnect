@@ -99,6 +99,19 @@ const Api = {
     }
     if (endpoint === '/seats/lock') return mock.lockSeat(body.seatId, body.durationMinutes);
     if (endpoint === '/seats/unlock') return mock.unlockSeat(body.seatId);
+    if (endpoint.startsWith('/seats/layout/')) {
+      const coachId = endpoint.split('/').pop();
+      return mock.getCoachLayout(coachId);
+    }
+    if (endpoint === '/seats/auto-allocate') {
+      return mock.autoAllocateSeats(body.trainId, body.coachType, body.passengers, body.journeyDate);
+    }
+    if (endpoint.startsWith('/seats/coaches/')) {
+      const coachType = sessionStorage.getItem('rc_coachType') || '3A';
+      return [
+        { id: 1, coachNumber: coachType === 'CC' ? 'C1' : coachType === 'EC' ? 'E1' : coachType === '2A' ? 'A1' : coachType === '1A' ? 'H1' : coachType === 'SL' ? 'S1' : 'B1', coachType: coachType, totalSeats: 40 }
+      ];
+    }
     if (endpoint.startsWith('/seats/available/')) return [1, 2, 5, 8, 12, 15, 18, 22, 25, 30];
     if (endpoint === '/bookings/create') return mock.createBooking(body);
     if (endpoint === '/bookings/my') return mock.getDB().bookings;
@@ -316,6 +329,10 @@ const Api = {
   // --------------------------------------------------------------------------
   // Seat Engine Endpoints (Locking & Auto-Allocation)
   // --------------------------------------------------------------------------
+  async getCoaches(trainId) {
+    return await this.request(`/seats/coaches/${trainId}`);
+  },
+
   async getCoachLayout(coachId) {
     return await this.request(`/seats/layout/${coachId}`);
   },

@@ -1425,15 +1425,171 @@
       return matchedTrains;
     },
 
+    lockSeat(seatId, durationMinutes = 10) {
+      const db = loadDB();
+      if (!db.lockedSeats) db.lockedSeats = {};
+      const duration = parseInt(durationMinutes) || 10;
+      const expiry = Date.now() + (duration * 60 * 1000);
+      db.lockedSeats[seatId] = {
+        seatId: seatId,
+        lockedAt: Date.now(),
+        expiresAt: expiry
+      };
+      saveDB(db);
+      return {
+        seatId: seatId,
+        locked: true,
+        remainingSeconds: duration * 60,
+        expiresAt: expiry
+      };
+    },
+
     unlockSeat(seatId) {
       const db = loadDB();
+      if (!db.lockedSeats) db.lockedSeats = {};
       delete db.lockedSeats[seatId];
       saveDB(db);
-      return { success: true, seatId };
+      return { success: true, seatId: seatId };
+    },
+
+    getCoachLayout(coachId) {
+      const db = loadDB();
+      if (!db.lockedSeats) db.lockedSeats = {};
+
+      // Clean up expired locks
+      const now = Date.now();
+      for (const [k, v] of Object.entries(db.lockedSeats)) {
+        if (v && v.expiresAt && v.expiresAt < now) {
+          delete db.lockedSeats[k];
+        }
+      }
+      saveDB(db);
+
+      let coachType = '3A';
+      let coachNumber = 'B1';
+      const cId = parseInt(coachId) || 1;
+
+      if (cId === 1 || cId === 2) {
+        coachType = 'CC';
+        coachNumber = `C${cId}`;
+      } else if (cId === 3) {
+        coachType = 'EC';
+        coachNumber = 'E1';
+      } else if (cId === 4 || cId === 5 || cId === 8) {
+        coachType = '3A';
+        coachNumber = (cId === 5 ? 'B2' : 'B1');
+      } else if (cId === 7) {
+        coachType = '2A';
+        coachNumber = 'A1';
+      } else if (cId === 9) {
+        coachType = '1A';
+        coachNumber = 'H1';
+      } else if (cId === 6 || cId === 10) {
+        coachType = 'SL';
+        coachNumber = (cId === 10 ? 'S2' : 'S1');
+      } else {
+        coachType = sessionStorage.getItem('rc_coachType') || '3A';
+        coachNumber = (coachType === 'CC' ? 'C1' : coachType === 'EC' ? 'E1' : coachType === 'SL' ? 'S1' : 'B1');
+      }
+
+      const isChair = (coachType === 'CC' || coachType === 'EC');
+      const totalSeats = coachType === 'EC' ? 24 : coachType === 'CC' ? 40 : 32;
+      const berths = isChair
+        ? (coachType === 'EC' ? ['WINDOW', 'AISLE', 'AISLE', 'WINDOW'] : ['WINDOW', 'MIDDLE', 'AISLE', 'AISLE', 'WINDOW'])
+        : ['LOWER', 'MIDDLE', 'UPPER', 'LOWER', 'MIDDLE', 'UPPER', 'SIDE_LOWER', 'SIDE_UPPER'];
+      const cabinDiv = isChair ? (coachType === 'EC' ? 4 : 5) : 8;
+
+      const seats = [];
+      let availableCount = 0;
+      for (let i = 1; i <= totalSeats; i++) {
+        const cabin = Math.floor((i - 1) / cabinDiv) + 1;
+        const bType = berths[(i - 1) % berths.length];
+        const isLocked = !!db.lockedSeats[i];
+        const isBooked = (i === 1 || i === 3);
+        let state = 'AVAILABLE';
+        if (isBooked) state = 'BOOKED';
+        else if (isLocked) state = 'LOCKED';
+        else availableCount++;
+
+        seats.push({
+          seatId: i,
+          seatNumber: i,
+          berthType: bType,
+          cabinNumber: cabin,
+          coachNumber: coachNumber,
+          state: state
+        });
+      }
+
+      return {
+        coachId: cId,
+        coachNumber: coachNumber,
+        coachType: coachType,
+        totalSeats: totalSeats,
+        availableCount: availableCount,
+        seats: seats
+      };
+    },
+
+    autoAllocateSeats(trainId, coachType, passengers, journeyDate) {
+      const db = loadDB();
+      if (!db.lockedSeats) db.lockedSeats = {};
+
+      const pList = (passengers && passengers.length > 0)
+        ? passengers
+        : [
+            { name: 'Primary Passenger', age: 65, gender: 'MALE', preference: 'LOWER' },
+            { name: 'Co-Passenger', age: 28, gender: 'FEMALE', preference: 'LOWER' }
+          ];
+
+      const cType = coachType || sessionStorage.getItem('rc_coachType') || '3A';
+      const defCoach = cType === 'CC' ? 'C1' : cType === 'EC' ? 'E1' : cType === '2A' ? 'A1' : cType === '1A' ? 'H1' : cType === 'SL' ? 'S1' : 'B1';
+      const isChair = (cType === 'CC' || cType === 'EC');
+      const berths = isChair
+        ? (cType === 'EC' ? ['WINDOW', 'AISLE', 'AISLE', 'WINDOW'] : ['WINDOW', 'MIDDLE', 'AISLE', 'AISLE', 'WINDOW'])
+        : ['LOWER', 'MIDDLE', 'UPPER', 'LOWER', 'MIDDLE', 'UPPER', 'SIDE_LOWER', 'SIDE_UPPER'];
+      const cabinDiv = isChair ? (cType === 'EC' ? 4 : 5) : 8;
+
+      const allocations = [];
+      let startSeat = 4; // Avoid pre-booked seats 1 & 3
+      for (let idx = 0; idx < pList.length; idx++) {
+        const p = pList[idx];
+        const sNum = startSeat + idx;
+        const bType = (p.age >= 60 || (p.preference && p.preference.includes('LOWER')))
+          ? (isChair ? 'WINDOW' : 'LOWER')
+          : berths[(sNum - 1) % berths.length];
+        const cabin = Math.floor((sNum - 1) / cabinDiv) + 1;
+
+        db.lockedSeats[sNum] = {
+          seatId: sNum,
+          lockedAt: Date.now(),
+          expiresAt: Date.now() + 600000
+        };
+
+        allocations.push({
+          seatId: sNum,
+          seatNumber: sNum,
+          coachNumber: defCoach,
+          berthType: bType,
+          cabinNumber: cabin,
+          passengerName: p.name || `Passenger ${idx + 1}`
+        });
+      }
+
+      saveDB(db);
+
+      return {
+        successful: true,
+        trainId: trainId || 1,
+        coachType: cType,
+        message: `Intelligent DSA Allocation: Successfully assigned ${pList.length} contiguous seat(s) in Coach ${defCoach} with preference matching!`,
+        allocations: allocations
+      };
     },
 
     createBooking(bookingData) {
       const db = loadDB();
+      if (!db.lockedSeats) db.lockedSeats = {};
       const pnr = Math.floor(1000000000 + Math.random() * 9000000000).toString();
       const ticketId = `TKT-${pnr.substring(0, 4)}-${Math.floor(10 + Math.random() * 90)}`;
 
@@ -1441,7 +1597,7 @@
         ? bookingData.passengers
         : [{ name: 'Passenger 1', age: 30, gender: 'Male' }];
 
-      const defCoach = bookingData.coachType === 'CC' ? 'C1' : bookingData.coachType === 'EC' ? 'E1' : 'B1';
+      const defCoach = bookingData.coachType === 'CC' ? 'C1' : bookingData.coachType === 'EC' ? 'E1' : bookingData.coachType === 'SL' ? 'S1' : 'B1';
       const passengers = rawPassengers.map((p, idx) => ({
         name: p.name || p.passengerName || `Passenger ${idx + 1}`,
         age: p.age || p.passengerAge || 29,
@@ -1451,6 +1607,13 @@
         berthType: p.berthType || p.allocatedBerthType || (bookingData.coachType === 'CC' ? 'WINDOW' : 'LOWER'),
         status: 'CONFIRMED'
       }));
+
+      // Release locks for booked seats
+      passengers.forEach(p => {
+        if (p.seatNumber && db.lockedSeats[p.seatNumber]) {
+          delete db.lockedSeats[p.seatNumber];
+        }
+      });
 
       const newBooking = {
         id: db.bookings.length + 101,

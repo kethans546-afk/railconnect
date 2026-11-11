@@ -207,7 +207,7 @@
           grid.appendChild(divider);
         }
 
-        const isSelected = selectedSeats.some(sel => sel.seatId === s.seatId);
+        const isSelected = selectedSeats.some(sel => sel.seatId === s.seatId || sel.seatNumber === s.seatNumber);
         let stateClass = 'state-available';
         if (isSelected) stateClass = 'state-selected';
         else if (s.state === 'BOOKED') stateClass = 'state-booked';
@@ -215,12 +215,12 @@
 
         const node = document.createElement('div');
         node.className = `seat-node ${stateClass}`;
-        node.id = `seat-${s.seatId}`;
+        node.id = `seat-${s.seatId || s.seatNumber}`;
         node.onclick = () => toggleSeatSelection(s);
 
         node.innerHTML = `
           <div class="seat-num">${s.seatNumber}</div>
-          <div class="berth-tag">${s.berthType.substring(0, 2)}</div>
+          <div class="berth-tag">${s.berthType ? s.berthType.substring(0, 2) : 'UB'}</div>
         `;
 
         grid.appendChild(node);
@@ -265,26 +265,32 @@
         Auth.showToast(`Seat ${seat.seatNumber} is already booked.`, 'warning');
         return;
       }
-      if (seat.state === 'LOCKED' && !selectedSeats.some(s => s.seatId === seat.seatId)) {
+      if (seat.state === 'LOCKED' && !selectedSeats.some(s => (s.seatId === seat.seatId || s.seatNumber === seat.seatNumber))) {
         Auth.showToast(`Seat ${seat.seatNumber} is temporarily locked by another user.`, 'warning');
         return;
       }
 
-      const existingIndex = selectedSeats.findIndex(s => s.seatId === seat.seatId);
+      // Ensure coachNumber is present
+      if (!seat.coachNumber) {
+        const selEl = document.getElementById('coachSelect');
+        seat.coachNumber = selEl ? (selEl.options[selEl.selectedIndex]?.text?.match(/Coach\s+([A-Z0-9]+)/)?.[1] || 'B1') : 'B1';
+      }
+
+      const existingIndex = selectedSeats.findIndex(s => (s.seatId && s.seatId === seat.seatId) || s.seatNumber === seat.seatNumber);
 
       if (existingIndex !== -1) {
         // Deselect and unlock seat
         selectedSeats.splice(existingIndex, 1);
         try {
-          await Api.unlockSeat(seat.seatId);
+          await Api.unlockSeat(seat.seatId || seat.seatNumber);
         } catch (ignored) {}
       } else {
         // Select and dynamically lock seat for 10 minutes
         try {
-          const lockResp = await Api.lockSeat(seat.seatId, 10);
+          const lockResp = await Api.lockSeat(seat.seatId || seat.seatNumber, 10);
           selectedSeats.push(seat);
           Auth.showToast(`Seat ${seat.seatNumber} locked for 10 minutes!`, 'success');
-          startLockTimer(lockResp.remainingSeconds || 600);
+          startLockTimer((lockResp && lockResp.remainingSeconds) ? lockResp.remainingSeconds : 600);
         } catch (err) {
           Auth.showToast(err.message, 'danger');
           return;
@@ -297,7 +303,7 @@
     function updateSelectedUI() {
       document.querySelectorAll('.seat-node').forEach(node => {
         const id = parseInt(node.id.replace('seat-', ''));
-        if (selectedSeats.some(s => s.seatId === id)) {
+        if (selectedSeats.some(s => s.seatId === id || s.seatNumber === id)) {
           node.classList.add('state-selected');
           node.classList.remove('state-available');
         } else {
